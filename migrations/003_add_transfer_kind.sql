@@ -1,3 +1,4 @@
+-- +goose Up
 -- Remove a constraint antiga que só permite EXPENSE e INCOME
 ALTER TABLE purchases DROP CONSTRAINT IF EXISTS purchases_kind_check;
 
@@ -10,3 +11,10 @@ ALTER TABLE purchases
 ALTER TABLE purchases
     ADD CONSTRAINT chk_transfer_no_installment
         CHECK (kind != 'TRANSFER' OR type != 'INSTALLMENT');
+
+-- +goose Down
+ALTER TABLE purchases DROP CONSTRAINT IF EXISTS chk_transfer_no_installment;
+ALTER TABLE purchases DROP CONSTRAINT IF EXISTS purchases_kind_check;
+ALTER TABLE purchases
+    ADD CONSTRAINT purchases_kind_check
+        CHECK (kind IN ('EXPENSE', 'INCOME'));

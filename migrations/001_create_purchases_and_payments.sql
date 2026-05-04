@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE TABLE purchases (
@@ -33,3 +34,8 @@ CREATE INDEX idx_payments_purchase_id ON payments(purchase_id);
 CREATE INDEX idx_payments_status      ON payments(status);
 CREATE INDEX idx_purchases_type       ON purchases(type);
 CREATE INDEX idx_purchases_is_active  ON purchases(is_active) WHERE type = 'RECURRING';
+
+-- +goose Down
+DROP TABLE IF EXISTS payments;
+DROP TABLE IF EXISTS purchases;
+DROP EXTENSION IF EXISTS "pgcrypto";

@@ -17,6 +17,7 @@ import (
 	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/infra/gemini"
 	httpserver "github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/infra/http"
 	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/usecase"
+	"github.com/MarcosAAlbanoJunior/go-financial-assistant/migrations"
 )
 
 func main() {
@@ -33,6 +34,13 @@ func main() {
 		syscall.SIGINT, syscall.SIGTERM,
 	)
 	defer cancel()
+
+	slog.Info("running database migrations")
+	if err := db.RunMigrations(ctx, cfg.DatabaseURL, migrations.FS); err != nil {
+		slog.Error("failed to run migrations", "error", err)
+		os.Exit(1)
+	}
+	slog.Info("database migrations complete")
 
 	postgresDB, err := db.NewPostgres(ctx, cfg.DatabaseURL)
 	if err != nil {

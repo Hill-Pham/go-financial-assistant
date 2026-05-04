@@ -1,4 +1,4 @@
-.PHONY: run build test lint compose-up compose-down compose-logs db-shell
+.PHONY: run build test lint compose-up compose-down compose-logs db-shell migrate migrate-down migrate-status
 
 run:
 	docker compose up postgres redis -d
@@ -42,6 +42,15 @@ deps:
 	go mod tidy
 	go mod download
 
+migrate:
+	goose -dir migrations postgres "$(DATABASE_URL)" up
+
+migrate-down:
+	goose -dir migrations postgres "$(DATABASE_URL)" down
+
+migrate-status:
+	goose -dir migrations postgres "$(DATABASE_URL)" status
+
 help:
 	@echo ""
 	@echo "Comandos disponíveis:"
@@ -58,4 +67,7 @@ help:
 	@echo "  make logs-evolution   Logs apenas da Evolution API"
 	@echo "  make db-shell         Abre o psql no container"
 	@echo "  make deps             Baixa e organiza dependências"
+	@echo "  make migrate          Executa todas as migrations pendentes"
+	@echo "  make migrate-down     Desfaz a última migration"
+	@echo "  make migrate-status   Mostra o status das migrations"
 	@echo ""
