@@ -66,7 +66,7 @@ func main() {
 	monthlyReport := usecase.NewMonthlyReport(exportCSV, evolutionClient, cfg.OwnerPhone, logger)
 
 	if err := analyzeExpense.GenerateRecurringExpenses(ctx); err != nil {
-		slog.Error("erro ao gerar despesas recorrentes no startup", "error", err)
+		slog.Error("eerror in generating recurring expenses in the startup", "error", err)
 	}
 
 	go func() {
@@ -118,7 +118,7 @@ func main() {
 				Writer:     os.Stdout,
 				HalfBlocks: true,
 			})
-			fmt.Println("Escaneie o QR code acima com o WhatsApp para conectar.")
+			fmt.Println("Scan the QR code above with WhatsApp to connect.")
 		}
 	}
 

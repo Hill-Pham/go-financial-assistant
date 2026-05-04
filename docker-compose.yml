@@ -10,7 +10,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./migrations/001_create_purchases_and_payments.sql:/docker-entrypoint-initdb.d/001_create_purchases_and_payments.sql
+      # - ./migrations/001_create_purchases_and_payments.sql:/docker-entrypoint-initdb.d/001_create_purchases_and_payments.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U finassist -d finassist"]
       interval: 5s
@@ -23,9 +23,9 @@ services:
     ports:
       - "8082:8080"
     environment:
-      CONFIG_SESSION_PHONE_VERSION: "2.3000.1035712111"
+      CONFIG_SESSION_PHONE_VERSION: "2.3000.1038705703"
 
-      AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY}
+      AUTHENTICATION_API_KEY: sk_live_9f3A7xQ2LmP8vR6tYb1CwZ4DkE0hN5uJ
 
       WEBHOOK_GLOBAL_URL: http://app:3000/webhook
       WEBHOOK_GLOBAL_ENABLED: "true"
@@ -75,35 +75,35 @@ services:
     volumes:
       - redis_data:/data
 
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: finassist-app
-    ports:
-      - "3000:3000"
-    environment:
-      PORT: 3000
-      DATABASE_URL: postgres://finassist:finassist@postgres:5432/finassist?sslmode=disable
-      GEMINI_API_KEY: ${GEMINI_API_KEY}
-      EVOLUTION_API_KEY: ${EVOLUTION_API_KEY}
-      EVOLUTION_API_URL: http://evolution:8080
-      EVOLUTION_INSTANCE: ${EVOLUTION_INSTANCE}
-      ALLOWED_NUMBERS: ${ALLOWED_NUMBERS}
-      OWNER_PHONE: ${OWNER_PHONE}
-      ADMIN_SECRET: ${ADMIN_SECRET}
-    depends_on:
-      postgres:
-        condition: service_healthy
-      evolution:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
-      interval: 6s
-      timeout: 3s
-      retries: 15
-      start_period: 20s
-    restart: unless-stopped
+  # app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: finassist-app
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     PORT: 3000
+  #     DATABASE_URL: postgres://finassist:finassist@postgres:5432/finassist?sslmode=disable
+  #     GEMINI_API_KEY: ${GEMINI_API_KEY}
+  #     EVOLUTION_API_KEY: ${EVOLUTION_API_KEY}
+  #     EVOLUTION_API_URL: http://evolution:8080
+  #     EVOLUTION_INSTANCE: ${EVOLUTION_INSTANCE}
+  #     ALLOWED_NUMBERS: ${ALLOWED_NUMBERS}
+  #     OWNER_PHONE: ${OWNER_PHONE}
+  #     ADMIN_SECRET: ${ADMIN_SECRET}
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     evolution:
+  #       condition: service_healthy
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+  #     interval: 6s
+  #     timeout: 3s
+  #     retries: 15
+  #     start_period: 20s
+  #   restart: unless-stopped
 
 volumes:
   postgres_data:
