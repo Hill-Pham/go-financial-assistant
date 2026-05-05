@@ -88,18 +88,18 @@ type ExpenseOutput struct {
 
 	ExportMonthTime time.Time `json:"-"`
 
-	QueryIncome    float64 `json:"query_income,omitempty"`
-	QueryBalance   float64 `json:"query_balance,omitempty"`
-	QueryApplied    float64 `json:"query_applied,omitempty"`
-	QueryRedeemed   float64 `json:"query_redeemed,omitempty"`
+	QueryIncome      float64 `json:"query_income,omitempty"`
+	QueryBalance     float64 `json:"query_balance,omitempty"`
+	QueryApplied     float64 `json:"query_applied,omitempty"`
+	QueryRedeemed    float64 `json:"query_redeemed,omitempty"`
 	QueryNetInvested float64 `json:"query_net_invested,omitempty"`
-	QueryInAccount  float64 `json:"query_in_account,omitempty"`
+	QueryInAccount   float64 `json:"query_in_account,omitempty"`
 }
 
 func (uc *AnalyzeExpense) ExecuteText(ctx context.Context, input TextInput) (*ExpenseOutput, error) {
 	analysis, err := uc.analyzer.AnalyzeText(ctx, input.Text)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao analisar texto: %w", err)
+		return nil, fmt.Errorf("error when analyzing text: %w", err)
 	}
 
 	payment := resolvePaymentMethod(analysis.PaymentMethod, inferPaymentMethod(input.Text))
@@ -129,11 +129,11 @@ func (uc *AnalyzeExpense) ExecuteText(ctx context.Context, input TextInput) (*Ex
 func (uc *AnalyzeExpense) ExecuteImage(ctx context.Context, input ImageInput) (*ExpenseOutput, error) {
 	analysis, err := uc.analyzer.AnalyzeImage(ctx, input.ImageData, input.MimeType)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao analisar imagem: %w", err)
+		return nil, fmt.Errorf("error when analyzing image: %w", err)
 	}
 
 	payment := resolvePaymentMethod(analysis.PaymentMethod, inferPaymentMethod(input.Caption))
-	rawInput := fmt.Sprintf("[imagem: %s]", input.MimeType)
+	rawInput := fmt.Sprintf("[image: %s]", input.MimeType)
 
 	switch analysis.Type {
 	case ports.ExpenseTypeExportCSV:
@@ -158,7 +158,7 @@ func (uc *AnalyzeExpense) ExecuteImage(ctx context.Context, input ImageInput) (*
 func (uc *AnalyzeExpense) GenerateRecurringExpenses(ctx context.Context) error {
 	actives, err := uc.repo.FindActiveRecurring(ctx)
 	if err != nil {
-		return fmt.Errorf("erro ao buscar despesas recorrentes: %w", err)
+		return fmt.Errorf("error when searching for recurring expenses: %w", err)
 	}
 
 	now := time.Now().UTC()
@@ -176,7 +176,7 @@ func (uc *AnalyzeExpense) GenerateRecurringExpenses(ctx context.Context) error {
 
 		has, err := uc.repo.HasPaymentForMonth(ctx, p.ID, firstOfMonth)
 		if err != nil {
-			uc.logger.Error("erro ao verificar pagamento mensal", "purchase_id", p.ID, "error", err)
+			uc.logger.Error("error when checking monthly payment", "purchase_id", p.ID, "error", err)
 			continue
 		}
 		if has {
@@ -185,7 +185,7 @@ func (uc *AnalyzeExpense) GenerateRecurringExpenses(ctx context.Context) error {
 		payment := domain.NewPayment(p.ID, p.TotalAmount, domain.PaymentStatusPaid)
 		payment.ReferenceMonth = &firstOfMonth
 		if err := uc.repo.SavePayment(ctx, payment); err != nil {
-			uc.logger.Error("erro ao salvar pagamento recorrente", "purchase_id", p.ID, "error", err)
+			uc.logger.Error("error when saving recurring payment", "purchase_id", p.ID, "error", err)
 		}
 	}
 

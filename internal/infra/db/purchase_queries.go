@@ -59,7 +59,7 @@ func (r *PostgresPurchaseRepository) ExistsPaymentByDateAndAmount(ctx context.Co
 	`
 	var exists bool
 	if err := r.db.Pool.QueryRow(ctx, query, date, amount).Scan(&exists); err != nil {
-		return false, fmt.Errorf("erro ao verificar duplicata: %w", err)
+		return false, fmt.Errorf("error when checking duplicate payment: %w", err)
 	}
 	return exists, nil
 }
@@ -68,7 +68,7 @@ func (r *PostgresPurchaseRepository) HasPaymentForMonth(ctx context.Context, pur
 	query := `SELECT EXISTS(SELECT 1 FROM payments WHERE purchase_id = $1 AND reference_month = $2)`
 	var exists bool
 	if err := r.db.Pool.QueryRow(ctx, query, purchaseID, month).Scan(&exists); err != nil {
-		return false, fmt.Errorf("erro ao verificar pagamento do mês: %w", err)
+		return false, fmt.Errorf("error when verifying monthly payment: %w", err)
 	}
 	return exists, nil
 }
@@ -84,12 +84,12 @@ func (r *PostgresPurchaseRepository) FindActiveRecurring(ctx context.Context) ([
 	`
 	rows, err := r.db.Pool.Query(ctx, query)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao buscar despesas recorrentes ativas: %w", err)
+		return nil, fmt.Errorf("error when searching for active recurring expenses: %w", err)
 	}
 
 	models, err := pgx.CollectRows(rows, pgx.RowToStructByName[purchaseModel])
 	if err != nil {
-		return nil, fmt.Errorf("erro ao escanear compras: %w", err)
+		return nil, fmt.Errorf("error when scanning purchases: %w", err)
 	}
 
 	result := make([]domain.Purchase, len(models))
@@ -110,12 +110,12 @@ func (r *PostgresPurchaseRepository) FindByDescription(ctx context.Context, desc
 	`
 	rows, err := r.db.Pool.Query(ctx, query, "%"+description+"%")
 	if err != nil {
-		return nil, fmt.Errorf("erro ao buscar compras por descrição: %w", err)
+		return nil, fmt.Errorf("error when searching purchases by description: %w", err)
 	}
 
 	models, err := pgx.CollectRows(rows, pgx.RowToStructByName[purchaseModel])
 	if err != nil {
-		return nil, fmt.Errorf("erro ao escanear compras: %w", err)
+		return nil, fmt.Errorf("error when scanning purchases: %w", err)
 	}
 
 	result := make([]domain.Purchase, len(models))
@@ -138,7 +138,7 @@ func (r *PostgresPurchaseRepository) FindPaymentsByMonth(ctx context.Context, mo
 	`
 	rows, err := r.db.Pool.Query(ctx, query, month)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao consultar despesas do mês: %w", err)
+		return nil, fmt.Errorf("error when querying monthly expenses: %w", err)
 	}
 	defer rows.Close()
 
@@ -146,7 +146,7 @@ func (r *PostgresPurchaseRepository) FindPaymentsByMonth(ctx context.Context, mo
 	for rows.Next() {
 		var s ports.PaymentSummary
 		if err := rows.Scan(&s.Category, &s.Total); err != nil {
-			return nil, fmt.Errorf("erro ao escanear resumo: %w", err)
+			return nil, fmt.Errorf("error when scanning summary: %w", err)
 		}
 		result = append(result, s)
 	}
@@ -176,12 +176,12 @@ func (r *PostgresPurchaseRepository) FindPaymentDetailsByMonth(ctx context.Conte
 	`
 	rows, err := r.db.Pool.Query(ctx, query, month)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao consultar detalhes do mês: %w", err)
+		return nil, fmt.Errorf("error when querying monthly payment details: %w", err)
 	}
 
 	models, err := pgx.CollectRows(rows, pgx.RowToStructByName[paymentDetailModel])
 	if err != nil {
-		return nil, fmt.Errorf("erro ao escanear detalhes: %w", err)
+		return nil, fmt.Errorf("error when scanning payment details: %w", err)
 	}
 
 	result := make([]ports.PaymentDetail, len(models))
@@ -190,4 +190,3 @@ func (r *PostgresPurchaseRepository) FindPaymentDetailsByMonth(ctx context.Conte
 	}
 	return result, nil
 }
-

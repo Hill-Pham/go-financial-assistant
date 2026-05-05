@@ -66,7 +66,7 @@ func main() {
 	monthlyReport := usecase.NewMonthlyReport(exportCSV, evolutionClient, cfg.OwnerPhone, logger)
 
 	if err := analyzeExpense.GenerateRecurringExpenses(ctx); err != nil {
-		slog.Error("eerror in generating recurring expenses in the startup", "error", err)
+		slog.Error("error in generating expenses in the startup", "error", err)
 	}
 
 	go func() {
@@ -78,11 +78,11 @@ func main() {
 				return
 			case <-time.After(time.Until(next)):
 				if err := analyzeExpense.GenerateRecurringExpenses(ctx); err != nil {
-					slog.Error("erro ao gerar despesas recorrentes", "error", err)
+					slog.Error("error in generating recurring expenses", "error", err)
 				}
 				if time.Now().UTC().Day() == 1 {
 					if err := monthlyReport.Send(ctx); err != nil {
-						slog.Error("erro ao enviar relatório mensal", "error", err)
+						slog.Error("error in sending monthly report", "error", err)
 					}
 				}
 			}
@@ -94,7 +94,7 @@ func main() {
 		if err == nil {
 			break
 		}
-		slog.Warn("Evolution API não disponível, aguardando...", "error", err)
+		slog.Warn("Evolution API not available, waiting...", "error", err)
 		select {
 		case <-ctx.Done():
 			os.Exit(0)
@@ -106,11 +106,11 @@ func main() {
 
 	state, err := evolutionClient.FetchConnectionState(ctx)
 	if err != nil {
-		slog.Warn("não foi possível verificar estado da conexão", "error", err)
+		slog.Warn("failed to fetch connection state", "error", err)
 	} else if state != "open" {
 		code, _, err := evolutionClient.FetchConnectCode(ctx)
 		if err != nil {
-			slog.Warn("não foi possível buscar QR code, acesse manualmente",
+			slog.Warn("failed to fetch QR code, please access manually",
 				"url", fmt.Sprintf("%s/instance/connect/%s", cfg.EvolutionAPIURL, cfg.EvolutionInstance))
 		} else {
 			qrterminal.GenerateWithConfig(code, qrterminal.Config{
