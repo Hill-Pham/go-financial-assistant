@@ -20,7 +20,7 @@ Reply ONLY with valid JSON in the following format:
       "kind": "<EXPENSE|INCOME|TRANSFER>",
       "direction": "<OUT|IN|null>",
       "category": "<FOOD|TRANSPORT|HEALTH|ENTERTAINMENT|SHOPPING|MARKET|INVESTMENT|SALARY|OTHER>",
-      "payment_method": "<PIX|CREDIT_CARD|DEBIT_CARD|CASH|OTHER>"
+      "payment_method": "<CREDIT_CARD|DEBIT_CARD|CASH|OTHER>"
     }
   ]
 }
@@ -61,7 +61,7 @@ Reply ONLY with valid JSON in the following format:
   "amount": <total amount in BRL, null if unknown>,
   "description": "<short description>",
   "category": "<FOOD|TRANSPORT|HEALTH|ENTERTAINMENT|SHOPPING|MARKET|INVESTMENT|SALARY|OTHER>",
-  "payment_method": "<CASH|CREDIT_CARD|DEBIT_CARD|PIX|OTHER>",
+  "payment_method": "<CASH|CREDIT_CARD|DEBIT_CARD|OTHER>",
   "transfer_direction": "<OUT|IN|null>",
   "confidence": <0.0 to 1.0>,
   "installments": {
@@ -87,10 +87,10 @@ Reply ONLY with valid JSON in the following format:
 Classification rules:
 - SINGLE: normal one-time expense (most cases of outgoing money to third parties)
 - INSTALLMENT: credit purchase in installments ("in 12x", "split into 6 installments", "12 installments of 100 VND", etc.)
-- RECURRING: recurring monthly expense (subscriptions, monthly fees, plans - "Netflix every month", "gym 80 VND/month", "monthly health plan", etc.)
+- RECURRING: recurring monthly expense (subscriptions, monthly fees, plans - "Netflix every month", "gym 80000 VND/month", "monthly health plan", etc.)
 - CANCEL_RECURRING: cancellation of recurring expense or recurring income ("I canceled Netflix", "I stopped paying gym", "I canceled subscription", etc.)
-- INCOME: one-time incoming money from external source ("I received 500 VND freelance", "received transfer", "I sold something for 200 VND", etc.)
-- INCOME_RECURRING: recurring incoming money from external source (monthly salary - "my salary is 5000 VND", "I receive 3000 VND every day 5", etc.)
+- INCOME: one-time incoming money from external source ("I received 500000 VND freelance", "received transfer", "I sold something for 200 VND", etc.)
+- INCOME_RECURRING: recurring incoming money from external source (monthly salary - "my salary is 500000 VND", "I receive 300000 VND every day 5", etc.)
 - TRANSFER: movement between the account holder's OWN accounts.TRANSFER is NOT income or expense - it is reallocation of own money.
 - QUERY: expense query ("how much did I spend this month", "March summary", "my expenses from February 2025", etc.)
 - EXPORT_CSV: spreadsheet export request ("export expenses", "send me the csv", "March spreadsheet", etc.)
