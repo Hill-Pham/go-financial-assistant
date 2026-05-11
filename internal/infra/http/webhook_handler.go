@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/domain/ports"
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/usecase"
+	"github.com/Hill-Pham/go-financial-assistant/internal/domain/ports"
+	"github.com/Hill-Pham/go-financial-assistant/internal/usecase"
 )
 
 const pendingImportTTL = 30 * time.Minute

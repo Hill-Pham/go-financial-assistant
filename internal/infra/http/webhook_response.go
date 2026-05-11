@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/domain"
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/usecase"
+	"github.com/Hill-Pham/go-financial-assistant/internal/domain"
+	"github.com/Hill-Pham/go-financial-assistant/internal/usecase"
 )
 
 func formatStatementSummary(output *usecase.StatementOutput) string {

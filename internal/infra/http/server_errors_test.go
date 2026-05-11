@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/domain"
+	"github.com/Hill-Pham/go-financial-assistant/internal/domain"
 )
 
 func TestHandleError_InvalidAmount(t *testing.T) {

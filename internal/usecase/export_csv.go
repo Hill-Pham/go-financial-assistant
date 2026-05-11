@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/domain"
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/domain/ports"
+	"github.com/Hill-Pham/go-financial-assistant/internal/domain"
+	"github.com/Hill-Pham/go-financial-assistant/internal/domain/ports"
 )
 
 type ExportSummary struct {

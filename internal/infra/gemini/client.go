@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/domain/ports"
+	"github.com/Hill-Pham/go-financial-assistant/internal/domain/ports"
 	"google.golang.org/genai"
 )
 

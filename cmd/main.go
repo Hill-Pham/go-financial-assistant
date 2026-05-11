@@ -11,13 +11,13 @@ import (
 
 	"github.com/mdp/qrterminal/v3"
 
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/config"
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/infra/db"
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/infra/evolution"
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/infra/gemini"
-	httpserver "github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/infra/http"
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/usecase"
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/migrations"
+	"github.com/Hill-Pham/go-financial-assistant/internal/config"
+	"github.com/Hill-Pham/go-financial-assistant/internal/infra/db"
+	"github.com/Hill-Pham/go-financial-assistant/internal/infra/evolution"
+	"github.com/Hill-Pham/go-financial-assistant/internal/infra/gemini"
+	httpserver "github.com/Hill-Pham/go-financial-assistant/internal/infra/http"
+	"github.com/Hill-Pham/go-financial-assistant/internal/usecase"
+	"github.com/Hill-Pham/go-financial-assistant/migrations"
 )
 
 func main() {

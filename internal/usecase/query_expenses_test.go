@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/domain/ports"
+	"github.com/Hill-Pham/go-financial-assistant/internal/domain/ports"
 )
 
 func TestProcessQuery_CurrentMonth(t *testing.T) {

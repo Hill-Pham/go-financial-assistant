@@ -1,4 +1,4 @@
-module github.com/MarcosAAlbanoJunior/go-financial-assistant
+module github.com/Hill-Pham/go-financial-assistant
 
 go 1.26.1
 

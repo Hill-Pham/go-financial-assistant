@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/usecase"
+	"github.com/Hill-Pham/go-financial-assistant/internal/usecase"
 )
 
 type errReader struct{}

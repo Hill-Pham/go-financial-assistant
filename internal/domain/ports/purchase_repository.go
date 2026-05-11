@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/domain"
+	"github.com/Hill-Pham/go-financial-assistant/internal/domain"
 	"github.com/google/uuid"
 )
 

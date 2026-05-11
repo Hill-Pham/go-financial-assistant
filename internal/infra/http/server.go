@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/domain/ports"
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/usecase"
+	"github.com/Hill-Pham/go-financial-assistant/internal/domain/ports"
+	"github.com/Hill-Pham/go-financial-assistant/internal/usecase"
 )
 
 type ServerConfig struct {

@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/usecase"
+	"github.com/Hill-Pham/go-financial-assistant/internal/usecase"
 )
 
 func exportAnalyzer(month time.Time) *mockAnalyzer {

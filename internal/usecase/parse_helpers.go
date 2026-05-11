@@ -3,7 +3,7 @@ package usecase
 import (
 	"strings"
 
-	"github.com/MarcosAAlbanoJunior/go-financial-assistant/internal/domain"
+	"github.com/Hill-Pham/go-financial-assistant/internal/domain"
 )
 
 func resolvePaymentMethod(aiSuggestion *string, fallback string) string {
