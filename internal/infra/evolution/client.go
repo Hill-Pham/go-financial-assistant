@@ -58,14 +58,14 @@ func (c *Client) EnsureInstance(ctx context.Context, ownerPhone string) (bool, e
 		"token":        c.apiKey,
 	})
 	if err != nil {
-		return false, fmt.Errorf("erro ao serializar request: %w", err)
+		return false, fmt.Errorf("error serializing request: %w", err)
 	}
 
 	endpoint := fmt.Sprintf("%s/instance/create", c.baseURL)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
 	if err != nil {
-		return false, fmt.Errorf("erro ao criar request: %w", err)
+		return false, fmt.Errorf("error creating request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -73,7 +73,7 @@ func (c *Client) EnsureInstance(ctx context.Context, ownerPhone string) (bool, e
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return false, fmt.Errorf("erro ao criar instância: %w", err)
+		return false, fmt.Errorf("error creating instance: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -83,11 +83,11 @@ func (c *Client) EnsureInstance(ctx context.Context, ownerPhone string) (bool, e
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return false, fmt.Errorf("erro ao ler resposta: %w", err)
+		return false, fmt.Errorf("error reading response: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusCreated {
-		return false, fmt.Errorf("evolution API retornou status %d: %s", resp.StatusCode, string(respBody))
+		return false, fmt.Errorf("evolution API returned status %d: %s", resp.StatusCode, string(respBody))
 	}
 
 	return true, nil
@@ -98,29 +98,29 @@ func (c *Client) FetchConnectionState(ctx context.Context) (string, error) {
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
-		return "", fmt.Errorf("erro ao criar request: %w", err)
+		return "", fmt.Errorf("error creating request: %w", err)
 	}
 
 	req.Header.Set("apikey", c.apiKey)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("erro ao buscar estado da conexão: %w", err)
+		return "", fmt.Errorf("error fetching connection state: %w", err)
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("erro ao ler resposta: %w", err)
+		return "", fmt.Errorf("error reading response: %w", err)
 	}
 
 	if resp.StatusCode >= 400 {
-		return "", fmt.Errorf("evolution API retornou status %d: %s", resp.StatusCode, string(respBody))
+		return "", fmt.Errorf("evolution API returned status %d: %s", resp.StatusCode, string(respBody))
 	}
 
 	var result connectionStateResponse
 	if err := json.Unmarshal(respBody, &result); err != nil {
-		return "", fmt.Errorf("erro ao deserializar resposta: %w", err)
+		return "", fmt.Errorf("error deserializing response: %w", err)
 	}
 
 	return result.Instance.State, nil
@@ -131,29 +131,29 @@ func (c *Client) FetchConnectCode(ctx context.Context) (code, base64 string, err
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
-		return "", "", fmt.Errorf("erro ao criar request: %w", err)
+		return "", "", fmt.Errorf("error creating request: %w", err)
 	}
 
 	req.Header.Set("apikey", c.apiKey)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", "", fmt.Errorf("erro ao buscar QR code: %w", err)
+		return "", "", fmt.Errorf("error fetching QR code: %w", err)
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", "", fmt.Errorf("erro ao ler resposta: %w", err)
+		return "", "", fmt.Errorf("error reading response: %w", err)
 	}
 
 	if resp.StatusCode >= 400 {
-		return "", "", fmt.Errorf("evolution API retornou status %d: %s", resp.StatusCode, string(respBody))
+		return "", "", fmt.Errorf("evolution API returned status %d: %s", resp.StatusCode, string(respBody))
 	}
 
 	var result connectResponse
 	if err := json.Unmarshal(respBody, &result); err != nil {
-		return "", "", fmt.Errorf("erro ao deserializar resposta: %w", err)
+		return "", "", fmt.Errorf("error deserializing response: %w", err)
 	}
 
 	return result.Code, result.Base64, nil

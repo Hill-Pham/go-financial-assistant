@@ -47,16 +47,16 @@ func (uc *AnalyzeExpense) processQuery(ctx context.Context, analysis *ports.Expe
 
 	netInvested := applied - redeemed
 	return &ExpenseOutput{
-		Type:            "QUERY",
-		QueryMonth:      formatMonthPT(targetMonth),
-		QueryTotal:      total,
-		QueryCategories: categories,
-		QueryIncome:     incomeTotal,
-		QueryBalance:    incomeTotal - total,
-		QueryApplied:    applied,
-		QueryRedeemed:   redeemed,
+		Type:             "QUERY",
+		QueryMonth:       formatMonthPT(targetMonth),
+		QueryTotal:       total,
+		QueryCategories:  categories,
+		QueryIncome:      incomeTotal,
+		QueryBalance:     incomeTotal - total,
+		QueryApplied:     applied,
+		QueryRedeemed:    redeemed,
 		QueryNetInvested: netInvested,
-		QueryInAccount:  (incomeTotal - total) - netInvested,
+		QueryInAccount:   (incomeTotal - total) - netInvested,
 	}, nil
 }
 
@@ -77,8 +77,8 @@ func resolveQueryMonth(info *ports.QueryInfo) time.Time {
 }
 
 var ptMonths = [...]string{
-	"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-	"Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+	"January", "February", "March", "April", "May", "June",
+	"July", "August", "September", "October", "November", "December",
 }
 
 func formatMonthPT(t time.Time) string {
