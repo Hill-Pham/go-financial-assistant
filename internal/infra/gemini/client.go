@@ -23,7 +23,7 @@ func NewClient(ctx context.Context, apiKey string) (*Client, error) {
 		Backend: genai.BackendGeminiAPI,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("erro ao criar cliente gemini: %w", err)
+		return nil, fmt.Errorf("Error creating Gemini client: %w", err)
 	}
 
 	config := &genai.GenerateContentConfig{
@@ -47,7 +47,7 @@ func (c *Client) AnalyzeText(ctx context.Context, text string) (*ports.ExpenseAn
 
 	resp, err := c.client.Models.GenerateContent(ctx, modelName, genai.Text(prompt), c.config)
 	if err != nil {
-		return nil, fmt.Errorf("error when calling gemini: %w", err)
+		return nil, fmt.Errorf("Error when calling Gemini: %w", err)
 	}
 
 	return parseResponse(resp)
@@ -66,7 +66,7 @@ func (c *Client) AnalyzeImage(ctx context.Context, imageData []byte, mimeType st
 
 	resp, err := c.client.Models.GenerateContent(ctx, modelName, contents, c.config)
 	if err != nil {
-		return nil, fmt.Errorf("error when analyzing image with gemini: %w", err)
+		return nil, fmt.Errorf("Error when analyzing image with Gemini: %w", err)
 	}
 
 	return parseResponse(resp)
@@ -87,14 +87,14 @@ func (c *Client) AnalyzeDocument(ctx context.Context, data []byte, mimeType stri
 			Role: "user",
 			Parts: []*genai.Part{
 				{InlineData: &genai.Blob{MIMEType: mimeType, Data: data}},
-				{Text: "Extraia todas as transações deste extrato bancário."},
+				{Text: "Extract all transactions from the bank statement."},
 			},
 		},
 	}
 
 	resp, err := c.client.Models.GenerateContent(ctx, modelName, contents, statementConfig)
 	if err != nil {
-		return nil, fmt.Errorf("error when analyzing statement with gemini: %w", err)
+		return nil, fmt.Errorf("Error when analyzing statement with Gemini: %w", err)
 	}
 
 	return parseStatementResponse(resp)
@@ -114,7 +114,7 @@ func parseResponse(resp *genai.GenerateContentResponse) (*ports.ExpenseAnalysis,
 
 	var geminiResp geminiResponse
 	if err := json.Unmarshal([]byte(rawJSON), &geminiResp); err != nil {
-		return nil, fmt.Errorf("error when deserializing gemini response: %w", err)
+		return nil, fmt.Errorf("Error when deserializing Gemini response: %w", err)
 	}
 
 	return geminiResp.toAnalysis(rawJSON), nil
@@ -231,17 +231,17 @@ type geminiStatementResponse struct {
 
 func parseStatementResponse(resp *genai.GenerateContentResponse) (*ports.StatementAnalysis, error) {
 	if resp == nil || len(resp.Candidates) == 0 {
-		return nil, fmt.Errorf("gemini returned empty response")
+		return nil, fmt.Errorf("Gemini returned empty response")
 	}
 
 	candidate := resp.Candidates[0]
 	if candidate.Content == nil || len(candidate.Content.Parts) == 0 {
-		return nil, fmt.Errorf("gemini returned empty content")
+		return nil, fmt.Errorf("Gemini returned empty content")
 	}
 
 	var raw geminiStatementResponse
 	if err := json.Unmarshal([]byte(candidate.Content.Parts[0].Text), &raw); err != nil {
-		return nil, fmt.Errorf("error when deserializing gemini statement: %w", err)
+		return nil, fmt.Errorf("Error when deserializing Gemini statement: %w", err)
 	}
 
 	analysis := &ports.StatementAnalysis{

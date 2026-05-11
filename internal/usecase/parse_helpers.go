@@ -16,8 +16,6 @@ func resolvePaymentMethod(aiSuggestion *string, fallback string) string {
 func inferPaymentMethod(text string) string {
 	lower := strings.ToLower(text)
 	switch {
-	case strings.Contains(lower, "pix"):
-		return "PIX"
 	case strings.Contains(lower, "credit"), strings.Contains(lower, "credit"):
 		return "CREDIT_CARD"
 	case strings.Contains(lower, "debit"), strings.Contains(lower, "debit"):
@@ -37,8 +35,6 @@ func parsePaymentMethod(s string) (domain.PaymentMethod, error) {
 		return domain.PaymentMethodCreditCard, nil
 	case "DEBIT_CARD":
 		return domain.PaymentMethodDebitCard, nil
-	case "PIX":
-		return domain.PaymentMethodPix, nil
 	case "OTHER", "":
 		return domain.PaymentMethodOther, nil
 	default:

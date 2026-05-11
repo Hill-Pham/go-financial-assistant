@@ -78,7 +78,7 @@ func NewPurchaseRepository(db *DB) ports.PurchaseRepository {
 func (r *PostgresPurchaseRepository) Save(ctx context.Context, purchase *domain.Purchase, payments []domain.Payment) error {
 	tx, err := r.db.Pool.Begin(ctx)
 	if err != nil {
-		return fmt.Errorf("erro ao iniciar transação: %w", err)
+		return fmt.Errorf("Error starting transaction: %w", err)
 	}
 	defer tx.Rollback(ctx) //nolint:errcheck
 
@@ -100,7 +100,7 @@ func (r *PostgresPurchaseRepository) Save(ctx context.Context, purchase *domain.
 		purchase.InstallmentAmount, purchase.DayOfMonth, purchase.IsActive,
 		purchase.RawInput, purchase.CreatedAt,
 	); err != nil {
-		return fmt.Errorf("erro ao salvar compra: %w", err)
+		return fmt.Errorf("Error saving purchase: %w", err)
 	}
 
 	paymentQuery := `
@@ -113,7 +113,7 @@ func (r *PostgresPurchaseRepository) Save(ctx context.Context, purchase *domain.
 			p.ID, p.PurchaseID, p.Amount, p.Status,
 			p.InstallmentNumber, p.DueDate, p.ReferenceMonth, p.PaidAt, p.CreatedAt,
 		); err != nil {
-			return fmt.Errorf("erro ao salvar pagamento: %w", err)
+			return fmt.Errorf("Error saving payment: %w", err)
 		}
 	}
 
@@ -130,7 +130,7 @@ func (r *PostgresPurchaseRepository) Update(ctx context.Context, purchase *domai
 		purchase.ID, purchase.IsActive, purchase.CancelledAt, purchase.CancellationReason,
 	)
 	if err != nil {
-		return fmt.Errorf("erro ao atualizar compra: %w", err)
+		return fmt.Errorf("Error updating purchase: %w", err)
 	}
 	return nil
 }
@@ -146,7 +146,7 @@ func (r *PostgresPurchaseRepository) FindIncomeTotalByMonth(ctx context.Context,
 	`
 	var total float64
 	if err := r.db.Pool.QueryRow(ctx, query, month).Scan(&total); err != nil {
-		return 0, fmt.Errorf("erro ao consultar entradas do mês: %w", err)
+		return 0, fmt.Errorf("Error querying monthly income: %w", err)
 	}
 	return total, nil
 }
@@ -163,7 +163,7 @@ func (r *PostgresPurchaseRepository) FindTransferNetByMonth(ctx context.Context,
 		  AND pay.status != 'CANCELLED'
 	`
 	if err = r.db.Pool.QueryRow(ctx, query, month).Scan(&applied, &redeemed); err != nil {
-		return 0, 0, fmt.Errorf("erro ao consultar transferências do mês: %w", err)
+		return 0, 0, fmt.Errorf("Error querying monthly transfers: %w", err)
 	}
 	return applied, redeemed, nil
 }
@@ -180,7 +180,7 @@ func (r *PostgresPurchaseRepository) SavePayment(ctx context.Context, payment *d
 		payment.PaidAt, payment.CreatedAt,
 	)
 	if err != nil {
-		return fmt.Errorf("erro ao salvar pagamento: %w", err)
+		return fmt.Errorf("Error saving payment: %w", err)
 	}
 	return nil
 }
