@@ -43,11 +43,11 @@ func (c *Client) Close() error {
 }
 
 func (c *Client) AnalyzeText(ctx context.Context, text string) (*ports.ExpenseAnalysis, error) {
-	prompt := fmt.Sprintf("Analise esta entrada financeira e extraia as informações:\n\n%s", text)
+	prompt := fmt.Sprintf("Analyze this financial entry and extract the information.:\n\n%s", text)
 
 	resp, err := c.client.Models.GenerateContent(ctx, modelName, genai.Text(prompt), c.config)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao chamar gemini: %w", err)
+		return nil, fmt.Errorf("error when calling gemini: %w", err)
 	}
 
 	return parseResponse(resp)
@@ -59,14 +59,14 @@ func (c *Client) AnalyzeImage(ctx context.Context, imageData []byte, mimeType st
 			Role: "user",
 			Parts: []*genai.Part{
 				{InlineData: &genai.Blob{MIMEType: mimeType, Data: imageData}},
-				{Text: "Analise esta nota fiscal ou recibo e extraia as informações da despesa."},
+				{Text: "Analyze this invoice or receipt and extract the expense information."},
 			},
 		},
 	}
 
 	resp, err := c.client.Models.GenerateContent(ctx, modelName, contents, c.config)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao analisar imagem com gemini: %w", err)
+		return nil, fmt.Errorf("error when analyzing image with gemini: %w", err)
 	}
 
 	return parseResponse(resp)
@@ -94,7 +94,7 @@ func (c *Client) AnalyzeDocument(ctx context.Context, data []byte, mimeType stri
 
 	resp, err := c.client.Models.GenerateContent(ctx, modelName, contents, statementConfig)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao analisar extrato com gemini: %w", err)
+		return nil, fmt.Errorf("error when analyzing statement with gemini: %w", err)
 	}
 
 	return parseStatementResponse(resp)
@@ -102,19 +102,19 @@ func (c *Client) AnalyzeDocument(ctx context.Context, data []byte, mimeType stri
 
 func parseResponse(resp *genai.GenerateContentResponse) (*ports.ExpenseAnalysis, error) {
 	if resp == nil || len(resp.Candidates) == 0 {
-		return nil, fmt.Errorf("gemini retornou resposta vazia")
+		return nil, fmt.Errorf("gemini returned empty response")
 	}
 
 	candidate := resp.Candidates[0]
 	if candidate.Content == nil || len(candidate.Content.Parts) == 0 {
-		return nil, fmt.Errorf("gemini retornou conteúdo vazio")
+		return nil, fmt.Errorf("gemini returned empty content")
 	}
 
 	rawJSON := candidate.Content.Parts[0].Text
 
 	var geminiResp geminiResponse
 	if err := json.Unmarshal([]byte(rawJSON), &geminiResp); err != nil {
-		return nil, fmt.Errorf("erro ao deserializar resposta gemini: %w", err)
+		return nil, fmt.Errorf("error when deserializing gemini response: %w", err)
 	}
 
 	return geminiResp.toAnalysis(rawJSON), nil
@@ -231,17 +231,17 @@ type geminiStatementResponse struct {
 
 func parseStatementResponse(resp *genai.GenerateContentResponse) (*ports.StatementAnalysis, error) {
 	if resp == nil || len(resp.Candidates) == 0 {
-		return nil, fmt.Errorf("gemini retornou resposta vazia")
+		return nil, fmt.Errorf("gemini returned empty response")
 	}
 
 	candidate := resp.Candidates[0]
 	if candidate.Content == nil || len(candidate.Content.Parts) == 0 {
-		return nil, fmt.Errorf("gemini retornou conteúdo vazio")
+		return nil, fmt.Errorf("gemini returned empty content")
 	}
 
 	var raw geminiStatementResponse
 	if err := json.Unmarshal([]byte(candidate.Content.Parts[0].Text), &raw); err != nil {
-		return nil, fmt.Errorf("erro ao deserializar extrato gemini: %w", err)
+		return nil, fmt.Errorf("error when deserializing gemini statement: %w", err)
 	}
 
 	analysis := &ports.StatementAnalysis{
@@ -251,7 +251,7 @@ func parseStatementResponse(resp *genai.GenerateContentResponse) (*ports.Stateme
 	for _, t := range raw.Transactions {
 		parsed, err := parseStatementDate(t.Date)
 		if err != nil {
-			continue // ignora linha com data inválida
+			continue // ignore line with invalid date
 		}
 		kind := t.Kind
 		if kind != "INCOME" && kind != "TRANSFER" {
@@ -262,7 +262,7 @@ func parseStatementResponse(resp *genai.GenerateContentResponse) (*ports.Stateme
 			if t.Direction == "IN" || t.Direction == "OUT" {
 				direction = t.Direction
 			} else if t.Amount > 0 {
-				// fallback heurístico: RESGATE tem "RESGATE" na descrição
+				// heuristic fallback: RESGATE has "RESGATE" in the description
 				if len(t.RawDescription) >= 6 && t.RawDescription[:6] == "RESGAT" {
 					direction = "IN"
 				} else {
@@ -298,7 +298,7 @@ func parseStatementDate(s string) (time.Time, error) {
 			return t, nil
 		}
 	}
-	return time.Time{}, fmt.Errorf("formato de data não reconhecido: %s", s)
+	return time.Time{}, fmt.Errorf("unrecognized date format: %s", s)
 }
 
 func toExpenseType(s string) ports.ExpenseType {

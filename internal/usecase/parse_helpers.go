@@ -18,11 +18,11 @@ func inferPaymentMethod(text string) string {
 	switch {
 	case strings.Contains(lower, "pix"):
 		return "PIX"
-	case strings.Contains(lower, "crédito"), strings.Contains(lower, "credito"):
+	case strings.Contains(lower, "credit"), strings.Contains(lower, "credit"):
 		return "CREDIT_CARD"
-	case strings.Contains(lower, "débito"), strings.Contains(lower, "debito"):
+	case strings.Contains(lower, "debit"), strings.Contains(lower, "debit"):
 		return "DEBIT_CARD"
-	case strings.Contains(lower, "dinheiro"), strings.Contains(lower, "especie"), strings.Contains(lower, "espécie"):
+	case strings.Contains(lower, "money"), strings.Contains(lower, "species"), strings.Contains(lower, "species"):
 		return "CASH"
 	default:
 		return "OTHER"

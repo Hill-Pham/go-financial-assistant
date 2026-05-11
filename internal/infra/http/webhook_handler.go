@@ -94,18 +94,18 @@ func (h *webhookHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	body, err := io.ReadAll(io.LimitReader(r.Body, 10<<20))
 	if err != nil {
-		h.writeError(w, "erro ao ler body", http.StatusBadRequest)
+		h.writeError(w, "error reading body", http.StatusBadRequest)
 		return
 	}
 
 	var envelope evolutionEnvelope
 	if err := json.Unmarshal(body, &envelope); err != nil {
-		h.writeError(w, "payload inválido", http.StatusBadRequest)
+		h.writeError(w, "invalid payload", http.StatusBadRequest)
 		return
 	}
 
 	if envelope.Event != "" && envelope.Event != "messages.upsert" {
-		h.logger.Info("evento ignorado", "event", envelope.Event)
+		h.logger.Info("ignored event", "event", envelope.Event)
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -113,14 +113,14 @@ func (h *webhookHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	var payload evolutionPayload
 	payload.Instance = envelope.Instance
 	if err := json.Unmarshal(envelope.Data, &payload.Data); err != nil {
-		h.writeError(w, "payload inválido", http.StatusBadRequest)
+		h.writeError(w, "invalid payload", http.StatusBadRequest)
 		return
 	}
 
 	msgID := payload.Data.Key.ID
 	from := payload.Data.Key.RemoteJID
 
-	h.logger.Info("webhook recebido", "instance", payload.Instance, "from", maskPhone(from), "id", msgID)
+	h.logger.Info("webhook received", "instance", payload.Instance, "from", maskPhone(from), "id", msgID)
 
 	if _, isSentByBot := h.sentIDs.LoadAndDelete(msgID); isSentByBot {
 		w.WriteHeader(http.StatusOK)
@@ -135,18 +135,18 @@ func (h *webhookHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, isAllowed := h.allowedNumbers[from]; !isAllowed {
-		h.logger.Info("mensagem ignorada", "from", maskPhone(from))
+		h.logger.Info("message ignored", "from", maskPhone(from))
 		w.WriteHeader(http.StatusOK)
 		return
 	}
 
-	// Documentos (PDF/extrato) têm fluxo próprio
+	// Documents (PDF/statement) have their own flow
 	if payload.Data.Message.DocumentMessage != nil {
 		h.handleDocumentImport(r.Context(), w, payload)
 		return
 	}
 
-	// Verifica se há uma importação pendente aguardando confirmação
+	// Check if there is a pending import awaiting confirmation
 	text := extractText(payload)
 	if h.tryHandlePendingConfirmation(r.Context(), w, text) {
 		return
@@ -167,7 +167,7 @@ func (h *webhookHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	reply := formatReply(output)
 
 	if sentID, msgErr := h.messenger.SendText(r.Context(), h.ownerPhone, reply); msgErr != nil {
-		h.logger.Error("erro ao enviar resposta", "error", msgErr)
+		h.logger.Error("error sending reply", "error", msgErr)
 	} else if sentID != "" {
 		h.sentIDs.Store(sentID, time.Now())
 	}
@@ -190,12 +190,12 @@ func (h *webhookHandler) handleDocumentImport(ctx context.Context, w http.Respon
 
 	base64Data := payload.Data.Base64
 	if base64Data == "" {
-		h.logger.Info("base64 ausente no webhook de documento, buscando via API")
+		h.logger.Info("base64 missing in document webhook, fetching via API")
 		key := payload.Data.Key
 		base64Data, err = h.messenger.FetchImageBase64(ctx, key.RemoteJID, key.FromMe, key.ID)
 		if err != nil {
-			h.logger.Error("falha ao buscar base64 do documento", "error", err)
-			h.sendText(ctx, "❌ Não consegui ler o documento. Tente enviar novamente.")
+			h.logger.Error("failed to fetch document base64", "error", err)
+			h.sendText(ctx, "❌ Could not read the document. Please try sending it again.")
 			w.WriteHeader(http.StatusOK)
 			return
 		}
@@ -203,8 +203,8 @@ func (h *webhookHandler) handleDocumentImport(ctx context.Context, w http.Respon
 
 	docData, err = decodeBase64Image(base64Data)
 	if err != nil {
-		h.logger.Error("falha ao decodificar base64 do documento", "error", err)
-		h.sendText(ctx, "❌ Não consegui processar o documento. Formato inválido.")
+		h.logger.Error("failed to decode document base64", "error", err)
+		h.sendText(ctx, "❌ Could not process the document. Invalid format.")
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -214,7 +214,7 @@ func (h *webhookHandler) handleDocumentImport(ctx context.Context, w http.Respon
 		mimeType = "application/pdf"
 	}
 
-	h.sendText(ctx, "⏳ Analisando o extrato, aguarde...")
+	h.sendText(ctx, "⏳ Analyzing the statement, please wait...")
 
 	result, err := h.analyzeExpense.ExecuteDocument(ctx, usecase.DocumentInput{
 		Data:     docData,
@@ -222,8 +222,8 @@ func (h *webhookHandler) handleDocumentImport(ctx context.Context, w http.Respon
 		Caption:  doc.Caption,
 	})
 	if err != nil {
-		h.logger.Error("erro ao processar extrato", "error", err)
-		h.sendText(ctx, "❌ Não consegui processar o extrato. Tente novamente.")
+		h.logger.Error("error processing statement", "error", err)
+		h.sendText(ctx, "❌ Could not process the statement. Please try again.")
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -272,7 +272,7 @@ func (h *webhookHandler) tryHandlePendingConfirmation(ctx context.Context, w htt
 
 	if session.index >= session.total {
 		h.pendingImports.Delete(h.ownerPhone)
-		h.sendText(ctx, "✅ Importação concluída!")
+		h.sendText(ctx, "✅ Import completed!")
 	} else {
 		session.expiresAt = time.Now().Add(pendingImportTTL)
 		next := session.items[session.index]
@@ -285,15 +285,15 @@ func (h *webhookHandler) tryHandlePendingConfirmation(ctx context.Context, w htt
 
 func (h *webhookHandler) saveConfirmedTransaction(ctx context.Context, tx usecase.PendingTransaction) {
 	if err := h.analyzeExpense.SavePendingTransaction(ctx, tx); err != nil {
-		h.logger.Error("erro ao salvar transação confirmada", "description", tx.Description, "error", err)
-		h.sendText(ctx, "⚠️ Não consegui salvar: "+tx.Description)
+		h.logger.Error("error saving confirmed transaction", "description", tx.Description, "error", err)
+		h.sendText(ctx, "⚠️ Could not save: "+tx.Description)
 	}
 }
 
 func (h *webhookHandler) notifyError(ctx context.Context, err error) {
-	msg := "Não consegui registrar a despesa: " + err.Error()
+	msg := "Could not register the expense: " + err.Error()
 	if sentID, msgErr := h.messenger.SendText(ctx, h.ownerPhone, msg); msgErr != nil {
-		h.logger.Error("erro ao enviar notificação de erro", "error", msgErr)
+		h.logger.Error("error sending error notification", "error", msgErr)
 	} else if sentID != "" {
 		h.sentIDs.Store(sentID, time.Now())
 	}
@@ -301,7 +301,7 @@ func (h *webhookHandler) notifyError(ctx context.Context, err error) {
 
 func (h *webhookHandler) sendText(ctx context.Context, msg string) {
 	if sentID, err := h.messenger.SendText(ctx, h.ownerPhone, msg); err != nil {
-		h.logger.Error("erro ao enviar mensagem", "error", err)
+		h.logger.Error("error sending message", "error", err)
 	} else if sentID != "" {
 		h.sentIDs.Store(sentID, time.Now())
 	}
@@ -338,18 +338,18 @@ func (h *webhookHandler) handleImage(ctx context.Context, payload evolutionPaylo
 
 	base64Data := payload.Data.Base64
 	if base64Data == "" {
-		h.logger.Info("base64 ausente no webhook, buscando via API")
+		h.logger.Info("base64 missing in webhook, fetching via API")
 		key := payload.Data.Key
 		base64Data, err = h.messenger.FetchImageBase64(ctx, key.RemoteJID, key.FromMe, key.ID)
 		if err != nil {
-			h.logger.Error("falha ao buscar base64 via API", "error", err)
+			h.logger.Error("failed to fetch base64 via API", "error", err)
 			return nil, errInvalidImage
 		}
 	}
 
 	imageData, err = decodeBase64Image(base64Data)
 	if err != nil {
-		h.logger.Error("falha ao decodificar base64", "error", err)
+		h.logger.Error("failed to decode base64", "error", err)
 		return nil, errInvalidImage
 	}
 

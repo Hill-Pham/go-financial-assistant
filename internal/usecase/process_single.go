@@ -16,7 +16,7 @@ func (uc *AnalyzeExpense) processAnalysis(
 ) (*ExpenseOutput, error) {
 	if analysis.Amount == nil {
 		return nil, fmt.Errorf(
-			"não foi possível identificar o valor da despesa (confiança: %.0f%%)",
+			"It was not possible to identify the expense amount (confidence: %.0f%%)",
 			analysis.Confidence*100,
 		)
 	}
@@ -35,7 +35,7 @@ func (uc *AnalyzeExpense) processAnalysis(
 		rawInput,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("despesa inválida: %w", err)
+		return nil, fmt.Errorf("invalid expense: %w", err)
 	}
 
 	status := domain.PaymentStatusPending
@@ -46,7 +46,7 @@ func (uc *AnalyzeExpense) processAnalysis(
 	pmt := domain.NewPayment(purchase.ID, *analysis.Amount, status)
 
 	if err := uc.repo.Save(ctx, purchase, []domain.Payment{*pmt}); err != nil {
-		return nil, fmt.Errorf("erro ao salvar despesa: %w", err)
+		return nil, fmt.Errorf("error saving expense: %w", err)
 	}
 
 	return &ExpenseOutput{

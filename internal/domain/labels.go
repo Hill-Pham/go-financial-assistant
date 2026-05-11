@@ -3,37 +3,37 @@ package domain
 func (c Category) Label() string {
 	switch c {
 	case CategoryFood:
-		return "Alimentação"
+		return "Food"
 	case CategoryTransport:
-		return "Transporte"
+		return "Transport"
 	case CategoryHealth:
-		return "Saúde"
+		return "Health"
 	case CategoryEntertainment:
-		return "Lazer"
+		return "Entertainment"
 	case CategoryShopping:
-		return "Compras"
+		return "Shopping"
 	case CategoryMarket:
-		return "Mercado"
+		return "Market"
 	case CategoryInvestment:
-		return "Investimento"
+		return "Investment"
 	case CategorySalary:
-		return "Salário/Renda"
+		return "Salary/Income"
 	default:
-		return "Outros"
+		return "Others"
 	}
 }
 
 func (p PaymentMethod) Label() string {
 	switch p {
 	case PaymentMethodCash:
-		return "Dinheiro"
+		return "Cash"
 	case PaymentMethodCreditCard:
-		return "Cartão de Crédito"
+		return "Credit Card"
 	case PaymentMethodDebitCard:
-		return "Cartão de Débito"
+		return "Debit Card"
 	case PaymentMethodPix:
 		return "Pix"
 	default:
-		return "Outro"
+		return "Other"
 	}
 }

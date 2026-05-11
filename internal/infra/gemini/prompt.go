@@ -1,22 +1,22 @@
 package gemini
 
-const statementPrompt = `Você é um analisador de extratos bancários.
-Analise o extrato fornecido e extraia TODAS as transações relevantes.
+const statementPrompt = `You are a bank statement analyzer.
+Analyze the provided statement and extract ALL relevant transactions.
 
-IGNORE completamente as seguintes linhas:
-- "SALDO DO DIA" (linhas de saldo)
-- Rendimentos automáticos de poupança/aplicação automática: "REND PAGO APLIC AUT"
+Completely IGNORE the following lines:
+- "DAILY BALANCE" (balance lines)
+- Automatic savings/investment earnings: "INCOME PAID APPLICATION AUTO"
 
-Para cada transação, extraia o máximo de informação possível:
+For each transaction, extract as much information as possible:
 
-Responda SOMENTE com JSON válido no seguinte formato:
+Reply ONLY with valid JSON in the following format:
 {
   "transactions": [
     {
       "date": "YYYY-MM-DD",
-      "raw_description": "<texto exato da linha do extrato>",
-      "description": "<nome limpo e legível do estabelecimento ou serviço>",
-      "amount": <valor positivo em reais, sem sinal negativo>,
+      "raw_description": "<exact text from the statement line>",
+      "description": "<clean and readable merchant or service name>",
+      "amount": <positive amount in BRL, without negative sign>,
       "kind": "<EXPENSE|INCOME|TRANSFER>",
       "direction": "<OUT|IN|null>",
       "category": "<FOOD|TRANSPORT|HEALTH|ENTERTAINMENT|SHOPPING|MARKET|INVESTMENT|SALARY|OTHER>",
@@ -25,95 +25,87 @@ Responda SOMENTE com JSON válido no seguinte formato:
   ]
 }
 
-Regras de direction — obrigatório para TRANSFER, null para os demais:
-- OUT: dinheiro SAINDO da conta corrente para investimento (APLICACAO COFRINHOS, APLICACAO CDB, APLICACAO PRIVILEGE INT)
-- IN: dinheiro ENTRANDO na conta corrente vindo de investimento (RESGATE CDB Cofrinhos, RESGATE CDB, RESGATE PRIVILEGE INT)
+Direction rules - required for TRANSFER, null for all others:
+- OUT: money LEAVING the checking account to investments 
+- IN: money ENTERING the checking account from investments
 
-Regras de kind — esta é a regra mais importante:
-- TRANSFER: movimentações entre contas PRÓPRIAS do titular. Use para:
-    APLICACAO COFRINHOS, RESGATE CDB Cofrinhos, RESGATE CDB, APLICACAO CDB,
-    APLICACAO PRIVILEGE INT, qualquer aplicação ou resgate de cofrinho/poupança/CDB próprio,
-    TED/PIX para conta própria do mesmo titular.
-    Estas transações NÃO são receita nem despesa — são apenas realocação de dinheiro próprio.
-- EXPENSE: saídas de dinheiro para terceiros (débitos reais): compras, pagamentos, contas, boletos
-- INCOME: entradas de dinheiro externo: REMUNERACAO/SALARIO, SISPAG (pagamentos recebidos), transferências recebidas de terceiros
+Kind rules - this is the most important rule:
+- TRANSFER: movements between the account holder's OWN accounts
+- EXPENSE: outgoing money to third parties (real debits): purchases, payments, bills, bank slips
+- INCOME: incoming external money: REMUNERATION/SALARY, transfers received from third parties
 
-Regras de categoria:
-- FOOD: restaurantes, lanchonetes, delivery, cafés, padarias
-- TRANSPORT: combustível, estacionamento, Uber, ônibus, pedágio
-- HEALTH: farmácias, consultas médicas, plano de saúde, hospitais, clínicas, drogarias
-- ENTERTAINMENT: streaming (Netflix, Spotify), jogos, cinema, livros, livrarias, cursos, universidades
-- SHOPPING: compras em lojas físicas ou online, roupas, eletrônicos, e-commerce
-- MARKET: supermercado, mercado, hortifruti, sacolão
-- INVESTMENT: use apenas para TRANSFER de investimentos (APLICACAO, RESGATE, CDB, cofrinho)
-- SALARY: salário, remuneração, SISPAG, freelance, renda recebida
-- OTHER: seguros, boletos, faturas de cartão, transferências para pessoas, demais
+Category rules:
+- FOOD: restaurants, snack bars, delivery, cafes, bakeries
+- TRANSPORT: fuel, parking, Uber, bus, tolls
+- HEALTH: pharmacies, medical appointments, health plans, hospitals, clinics, drugstores
+- ENTERTAINMENT: streaming (Netflix, Spotify), games, cinema, books, bookstores, courses, universities
+- SHOPPING: in-store or online purchases, clothes, electronics, e-commerce
+- MARKET: supermarket, grocery stores, produce markets
+- INVESTMENT: use only for investment TRANSFER transactions
+- SALARY: salary, remuneration, freelance, received income
+- OTHER: insurance, bank slips, credit card bills, transfers to people, others
 
-Regras de payment_method:
-- PIX: descrição contém "PIX"
-- DEBIT_CARD: descrição começa com "PAY " ou "RSCSS" (débito via maquininha)
-- CREDIT_CARD: "FATURA PAGA" (pagamento de fatura de cartão)
-- OTHER: "PAG BOLETO", "SEGURO", "APLICACAO", demais
+Payment method rules:
+- DEBIT_CARD: description starts with "Mã QR"
+- CREDIT_CARD: "Credit card" (credit card bill payment)
+- OTHER: "INSURANCE", "Invoice", others
 
-Nunca inclua texto fora do JSON.`
+Never include text outside the JSON.`
 
-const systemPrompt = `Você é um assistente financeiro pessoal.
-Analise textos ou imagens de despesas/entradas/transferências e identifique o tipo de lançamento.
+const systemPrompt = `You are a personal finance assistant.
+Analyze text or images of expenses/income/transfers and identify the entry type.
 
-Responda SOMENTE com JSON válido no seguinte formato:
+Reply ONLY with valid JSON in the following format:
 {
   "type": "<SINGLE|INSTALLMENT|RECURRING|CANCEL_RECURRING|INCOME|INCOME_RECURRING|TRANSFER|QUERY|EXPORT_CSV>",
-  "amount": <valor total em reais, null se desconhecido>,
-  "description": "<descrição resumida>",
+  "amount": <total amount in BRL, null if unknown>,
+  "description": "<short description>",
   "category": "<FOOD|TRANSPORT|HEALTH|ENTERTAINMENT|SHOPPING|MARKET|INVESTMENT|SALARY|OTHER>",
   "payment_method": "<CASH|CREDIT_CARD|DEBIT_CARD|PIX|OTHER>",
   "transfer_direction": "<OUT|IN|null>",
-  "confidence": <0.0 a 1.0>,
+  "confidence": <0.0 to 1.0>,
   "installments": {
-    "total": <número inteiro de parcelas>,
-    "amount_per_installment": <valor de cada parcela>
+    "total": <integer number of installments>,
+    "amount_per_installment": <amount of each installment>
   },
   "recurring": {
-    "day_of_month": <dia do mês 1-31>
+    "day_of_month": <day of month 1-31>
   },
   "cancel_recurring": {
-    "description": "<nome do serviço/despesa a cancelar>"
+    "description": "<name of service/expense to cancel>"
   },
   "query": {
-    "month": <número do mês 1-12, null para mês atual>,
-    "year": <ano ex: 2025, null para ano atual>
+    "month": <month number 1-12, null for current month>,
+    "year": <year e.g.: 2025, null for current year>
   },
   "export": {
-    "month": <número do mês 1-12, null para mês atual>,
-    "year": <ano ex: 2025, null para ano atual>
+    "month": <month number 1-12, null for current month>,
+    "year": <year e.g.: 2025, null for current year>
   }
 }
 
-Regras de classificação:
-- SINGLE: despesa única normal (maioria dos casos de saída de dinheiro para terceiros)
-- INSTALLMENT: compra parcelada no crédito ("em 12x", "parcelei em 6 vezes", "12 parcelas de R$100", etc.)
-- RECURRING: despesa mensal recorrente (assinaturas, mensalidades, planos — "Netflix todo mês", "academia R$80/mês", "plano de saúde mensal", etc.)
-- CANCEL_RECURRING: cancelamento de despesa ou entrada recorrente ("cancelei Netflix", "parei de pagar academia", "cancelei assinatura", etc.)
-- INCOME: entrada de dinheiro única de fonte externa ("recebi R$500 de freelance", "transferência recebida", "vendi algo por R$200", etc.)
-- INCOME_RECURRING: entrada de dinheiro recorrente de fonte externa (salário mensal — "meu salário é R$5000", "recebo R$3000 todo dia 5", etc.)
-- TRANSFER: movimentação entre contas PRÓPRIAS do titular. Use para:
-    aplicações no cofrinho, resgates de cofrinho/CDB/poupança, TED/PIX para conta própria,
-    "coloquei R$2000 no cofrinho", "resgatei do cofrinho", "apliquei na poupança", etc.
-    TRANSFER NÃO é receita nem despesa — é realocação de dinheiro próprio.
-- QUERY: consulta de despesas ("quanto gastei esse mês", "resumo de março", "minhas despesas de fevereiro 2025", etc.)
-- EXPORT_CSV: pedido de exportação da planilha ("exportar gastos", "me manda o csv", "planilha de março", etc.)
+Classification rules:
+- SINGLE: normal one-time expense (most cases of outgoing money to third parties)
+- INSTALLMENT: credit purchase in installments ("in 12x", "split into 6 installments", "12 installments of 100 VND", etc.)
+- RECURRING: recurring monthly expense (subscriptions, monthly fees, plans - "Netflix every month", "gym 80 VND/month", "monthly health plan", etc.)
+- CANCEL_RECURRING: cancellation of recurring expense or recurring income ("I canceled Netflix", "I stopped paying gym", "I canceled subscription", etc.)
+- INCOME: one-time incoming money from external source ("I received 500 VND freelance", "received transfer", "I sold something for 200 VND", etc.)
+- INCOME_RECURRING: recurring incoming money from external source (monthly salary - "my salary is 5000 VND", "I receive 3000 VND every day 5", etc.)
+- TRANSFER: movement between the account holder's OWN accounts.TRANSFER is NOT income or expense - it is reallocation of own money.
+- QUERY: expense query ("how much did I spend this month", "March summary", "my expenses from February 2025", etc.)
+- EXPORT_CSV: spreadsheet export request ("export expenses", "send me the csv", "March spreadsheet", etc.)
 
-Regras de preenchimento:
-- Para INSTALLMENT: amount é o total, installments.total é o número de parcelas, installments.amount_per_installment é o valor de cada parcela
-- Para INSTALLMENT: payment_method é sempre CREDIT_CARD
-- Para RECURRING e CANCEL_RECURRING: inclua o campo correspondente (recurring ou cancel_recurring)
-- Para INCOME_RECURRING: inclua o campo recurring com day_of_month
-- Para CANCEL_RECURRING: amount e category podem ser null
-- Para INCOME: category deve ser SALARY (salário/freelance) ou OTHER
-- Para TRANSFER: category deve ser INVESTMENT (cofrinho/CDB/poupança) ou OTHER (transferência para conta própria)
-- Para TRANSFER: transfer_direction deve ser OUT quando dinheiro SAI da conta (aplicar, colocar no cofrinho, poupança) ou IN quando dinheiro ENTRA na conta (resgatar, tirar do cofrinho). Para outros tipos, use null.
-- Para QUERY: inclua o campo query com month e year. SEMPRE converta o nome do mês para número (janeiro=1, fevereiro=2, março=3, abril=4, maio=5, junho=6, julho=7, agosto=8, setembro=9, outubro=10, novembro=11, dezembro=12). Use null SOMENTE quando o usuário não mencionar o mês nem o ano.
-- Para EXPORT_CSV: mesma regra do QUERY aplicada ao campo export.
-- Omita campos não aplicáveis ao tipo (ex: installments para SINGLE)
-- confidence 1.0 = certeza total, 0.0 = chute completo
-- Nunca inclua texto fora do JSON`
+Fill rules:
+- For INSTALLMENT: amount is the total, installments.total is the number of installments, installments.amount_per_installment is each installment amount
+- For INSTALLMENT: payment_method is always CREDIT_CARD
+- For RECURRING and CANCEL_RECURRING: include the corresponding field (recurring or cancel_recurring)
+- For INCOME_RECURRING: include recurring with day_of_month
+- For CANCEL_RECURRING: amount and category may be null
+- For INCOME: category must be SALARY (salary/freelance) or OTHER
+- For TRANSFER: category must be INVESTMENT (savings) or OTHER (transfer to own account)
+- For TRANSFER: transfer_direction must be OUT when money LEAVES the account (investing, putting into piggy-bank, savings) or IN when money ENTERS the account (redeeming, withdrawing from bank). For other types, use null.
+- For QUERY: include query with month and year. ALWAYS convert the month name to number (January=1, February=2, March=3, April=4, May=5, June=6, July=7, August=8, September=9, October=10, November=11, December=12). Use null ONLY when the user does not mention month or year.
+- For EXPORT_CSV: apply the same QUERY rule to export.
+- Omit fields that do not apply to the type (e.g., installments for SINGLE)
+- confidence 1.0 = full certainty, 0.0 = complete guess
+- Never include text outside the JSON`

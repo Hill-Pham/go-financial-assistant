@@ -19,7 +19,7 @@ type qrcodeHandler struct {
 
 func (h *qrcodeHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	if h.secret == "" {
-		http.Error(w, "endpoint desabilitado: configure ADMIN_SECRET", http.StatusServiceUnavailable)
+		http.Error(w, "endpoint disabled: configure ADMIN_SECRET", http.StatusServiceUnavailable)
 		return
 	}
 
@@ -30,7 +30,7 @@ func (h *qrcodeHandler) Handle(w http.ResponseWriter, r *http.Request) {
 
 	state, err := h.qrProvider.FetchConnectionState(r.Context())
 	if err != nil {
-		http.Error(w, fmt.Sprintf("erro ao verificar conexão: %v", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Error checking connection: %v", err), http.StatusInternalServerError)
 		return
 	}
 
@@ -38,19 +38,19 @@ func (h *qrcodeHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]any{
 			"connected": true,
-			"message":   "WhatsApp já está conectado",
+			"message":   "WhatsApp is already connected",
 		})
 		return
 	}
 
 	_, base64QR, err := h.qrProvider.FetchConnectCode(r.Context())
 	if err != nil {
-		http.Error(w, fmt.Sprintf("erro ao buscar QR code: %v", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Error searching for QR code.: %v", err), http.StatusInternalServerError)
 		return
 	}
 
 	if base64QR == "" {
-		http.Error(w, "QR code indisponível, tente novamente em instantes", http.StatusServiceUnavailable)
+		http.Error(w, "QR code unavailable, please try again later", http.StatusServiceUnavailable)
 		return
 	}
 

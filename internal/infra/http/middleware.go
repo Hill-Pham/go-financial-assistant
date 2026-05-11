@@ -13,14 +13,14 @@ func webhookSourceMiddleware(evolutionHost string, logger *slog.Logger, next htt
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip, _, err := net.SplitHostPort(r.RemoteAddr)
 		if err != nil {
-			logger.Warn("webhook bloqueado: RemoteAddr inválido", "remote_addr", r.RemoteAddr)
+			logger.Warn("webhook blocked: Invalid RemoteAddr", "remote_addr", r.RemoteAddr)
 			http.Error(w, "forbidden", http.StatusForbidden)
 			return
 		}
 
 		addrs, err := net.LookupHost(evolutionHost)
 		if err != nil {
-			logger.Warn("webhook bloqueado: não foi possível resolver host Evolution",
+			logger.Warn("webhook blocked: unable to resolve Evolution host",
 				"host", evolutionHost, "error", err)
 			http.Error(w, "forbidden", http.StatusForbidden)
 			return
@@ -33,7 +33,7 @@ func webhookSourceMiddleware(evolutionHost string, logger *slog.Logger, next htt
 			}
 		}
 
-		logger.Warn("webhook bloqueado: IP não autorizado",
+		logger.Warn("webhook blocked: unauthorized IP",
 			"ip", ip, "evolution_host", evolutionHost, "resolved_addrs", addrs)
 		http.Error(w, "forbidden", http.StatusForbidden)
 	})
@@ -43,7 +43,7 @@ func adminRateLimitMiddleware(rl *ipRateLimiter, next http.Handler) http.Handler
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
 		if !rl.allow(ip) {
-			http.Error(w, "too many requests, tente novamente em breve", http.StatusTooManyRequests)
+			http.Error(w, "too many requests, please try again later", http.StatusTooManyRequests)
 			return
 		}
 		next.ServeHTTP(w, r)

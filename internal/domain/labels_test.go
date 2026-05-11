@@ -13,13 +13,13 @@ func TestCategoryLabel(t *testing.T) {
 		{CategoryEntertainment, "Lazer"},
 		{CategoryShopping, "Compras"},
 		{CategoryMarket, "Mercado"},
-		{CategoryOther, "Outros"},
-		{Category("UNKNOWN"), "Outros"},
+		{CategoryOther, "Others"},
+		{Category("UNKNOWN"), "Others"},
 	}
 	for _, c := range cases {
 		got := c.category.Label()
 		if got != c.expected {
-			t.Errorf("Category(%q).Label() = %q, esperado %q", c.category, got, c.expected)
+			t.Errorf("Category(%q).Label() = %q, expected %q", c.category, got, c.expected)
 		}
 	}
 }
@@ -29,17 +29,17 @@ func TestPaymentMethodLabel(t *testing.T) {
 		method   PaymentMethod
 		expected string
 	}{
-		{PaymentMethodCash, "Dinheiro"},
-		{PaymentMethodCreditCard, "Cartão de Crédito"},
-		{PaymentMethodDebitCard, "Cartão de Débito"},
+		{PaymentMethodCash, "Cash"},
+		{PaymentMethodCreditCard, "Credit Card"},
+		{PaymentMethodDebitCard, "Debit Card"},
 		{PaymentMethodPix, "Pix"},
-		{PaymentMethodOther, "Outro"},
-		{PaymentMethod("UNKNOWN"), "Outro"},
+		{PaymentMethodOther, "Other"},
+		{PaymentMethod("UNKNOWN"), "Other"},
 	}
 	for _, c := range cases {
 		got := c.method.Label()
 		if got != c.expected {
-			t.Errorf("PaymentMethod(%q).Label() = %q, esperado %q", c.method, got, c.expected)
+			t.Errorf("PaymentMethod(%q).Label() = %q, expected %q", c.method, got, c.expected)
 		}
 	}
 }
