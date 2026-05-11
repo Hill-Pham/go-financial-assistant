@@ -34,7 +34,7 @@ func NewServer(
 	qrProvider QRProvider,
 	logger *slog.Logger,
 ) *Server {
-	logger.Info("iniciando servidor HTTP", "port", cfg.Port)
+	logger.Info("Starting HTTP server", "port", cfg.Port)
 
 	handler := newWebhookHandler(cfg, analyzeExpense, csvExporter, messenger, logger)
 	qrHandler := &qrcodeHandler{secret: cfg.AdminSecret, qrProvider: qrProvider}

@@ -21,11 +21,11 @@ func (c *Client) SendText(ctx context.Context, to string, text string) (string, 
 		"text":   text,
 	})
 	if err != nil {
-		return "", fmt.Errorf("erro ao serializar mensagem: %w", err)
+		return "", fmt.Errorf("error serializing message: %w", err)
 	}
 
 	endpoint := fmt.Sprintf("%s/message/sendText/%s", c.baseURL, url.PathEscape(c.instance))
-	return c.postAndExtractID(ctx, endpoint, body, "mensagem")
+	return c.postAndExtractID(ctx, endpoint, body, "message")
 }
 
 func (c *Client) SendDocument(ctx context.Context, to, filename, base64Data, caption string) (string, error) {
@@ -41,11 +41,11 @@ func (c *Client) SendDocument(ctx context.Context, to, filename, base64Data, cap
 		"caption":   caption,
 	})
 	if err != nil {
-		return "", fmt.Errorf("erro ao serializar documento: %w", err)
+		return "", fmt.Errorf("error serializing document: %w", err)
 	}
 
 	endpoint := fmt.Sprintf("%s/message/sendMedia/%s", c.baseURL, url.PathEscape(c.instance))
-	return c.postAndExtractID(ctx, endpoint, body, "documento")
+	return c.postAndExtractID(ctx, endpoint, body, "document")
 }
 
 func (c *Client) FetchImageBase64(ctx context.Context, remoteJid string, fromMe bool, messageID string) (string, error) {
@@ -59,14 +59,14 @@ func (c *Client) FetchImageBase64(ctx context.Context, remoteJid string, fromMe 
 		},
 	})
 	if err != nil {
-		return "", fmt.Errorf("erro ao serializar request: %w", err)
+		return "", fmt.Errorf("error serializing request: %w", err)
 	}
 
 	endpoint := fmt.Sprintf("%s/chat/getBase64FromMediaMessage/%s", c.baseURL, url.PathEscape(c.instance))
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
 	if err != nil {
-		return "", fmt.Errorf("erro ao criar request: %w", err)
+		return "", fmt.Errorf("error creating request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -74,22 +74,22 @@ func (c *Client) FetchImageBase64(ctx context.Context, remoteJid string, fromMe 
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("erro ao buscar base64: %w", err)
+		return "", fmt.Errorf("error fetching base64: %w", err)
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("erro ao ler resposta: %w", err)
+		return "", fmt.Errorf("error reading response: %w", err)
 	}
 
 	if resp.StatusCode >= 400 {
-		return "", fmt.Errorf("evolution API retornou status %d: %s", resp.StatusCode, string(respBody))
+		return "", fmt.Errorf("evolution API returned status %d: %s", resp.StatusCode, string(respBody))
 	}
 
 	var result fetchBase64Response
 	if err := json.Unmarshal(respBody, &result); err != nil {
-		return "", fmt.Errorf("erro ao deserializar resposta: %w", err)
+		return "", fmt.Errorf("error deserializing response: %w", err)
 	}
 
 	return result.Base64, nil
@@ -98,7 +98,7 @@ func (c *Client) FetchImageBase64(ctx context.Context, remoteJid string, fromMe 
 func (c *Client) postAndExtractID(ctx context.Context, endpoint string, body []byte, kind string) (string, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
 	if err != nil {
-		return "", fmt.Errorf("erro ao criar request: %w", err)
+		return "", fmt.Errorf("error creating request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -106,22 +106,22 @@ func (c *Client) postAndExtractID(ctx context.Context, endpoint string, body []b
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("erro ao enviar %s: %w", kind, err)
+		return "", fmt.Errorf("error sending %s: %w", kind, err)
 	}
 	defer resp.Body.Close()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("erro ao ler resposta: %w", err)
+		return "", fmt.Errorf("error reading response: %w", err)
 	}
 
 	if resp.StatusCode >= 400 {
-		return "", fmt.Errorf("evolution API retornou status %d: %s", resp.StatusCode, string(respBody))
+		return "", fmt.Errorf("evolution API returned status %d: %s", resp.StatusCode, string(respBody))
 	}
 
 	var result sendTextResponse
 	if err := json.Unmarshal(respBody, &result); err != nil {
-		return "", fmt.Errorf("erro ao deserializar resposta: %w", err)
+		return "", fmt.Errorf("error deserializing response: %w", err)
 	}
 
 	return result.Key.ID, nil
