@@ -258,13 +258,13 @@ func (h *webhookHandler) tryHandlePendingConfirmation(ctx context.Context, w htt
 	}
 
 	answer := strings.ToLower(strings.TrimSpace(text))
-	if answer != "sim" && answer != "s" && answer != "não" && answer != "nao" && answer != "n" {
+	if answer != "yes" && answer != "y" && answer != "no" && answer != "n" {
 		return false
 	}
 
 	current := session.items[session.index]
 
-	if answer == "sim" || answer == "s" {
+	if answer == "yes" || answer == "y" {
 		h.saveConfirmedTransaction(ctx, current)
 	}
 

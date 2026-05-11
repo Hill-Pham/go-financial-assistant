@@ -14,17 +14,17 @@ func (uc *AnalyzeExpense) processQuery(ctx context.Context, analysis *ports.Expe
 
 	summaries, err := uc.repo.FindPaymentsByMonth(ctx, targetMonth)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao consultar despesas: %w", err)
+		return nil, fmt.Errorf("error when checking expenses: %w", err)
 	}
 
 	incomeTotal, err := uc.repo.FindIncomeTotalByMonth(ctx, targetMonth)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao consultar entradas: %w", err)
+		return nil, fmt.Errorf("error when checking income: %w", err)
 	}
 
 	applied, redeemed, err := uc.repo.FindTransferNetByMonth(ctx, targetMonth)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao consultar transferências: %w", err)
+		return nil, fmt.Errorf("error when checking transfers: %w", err)
 	}
 
 	if len(summaries) == 0 && incomeTotal == 0 && applied == 0 && redeemed == 0 {

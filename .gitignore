@@ -2,3 +2,5 @@
 .claude
 .idea
 docker-compose.yml
+__debug_bin.exe
+docker-compose.yml

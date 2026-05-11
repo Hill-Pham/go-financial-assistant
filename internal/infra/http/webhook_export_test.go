@@ -28,7 +28,7 @@ func TestHandleExportCommand_SendsDocument(t *testing.T) {
 	}
 	exporter := &mockCSVExporter{
 		executeFn: func(_ context.Context, _ time.Time) ([]byte, string, *usecase.ExportSummary, error) {
-			return []byte("csv data"), "despesas_marco_2025.csv", nil, nil
+			return []byte("csv data"), "expenses_march_2025.csv", nil, nil
 		},
 	}
 

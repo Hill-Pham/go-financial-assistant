@@ -73,14 +73,14 @@ func TestProcessQuery_SpecificMonthYear(t *testing.T) {
 		},
 	}
 
-	output, err := newUC(repo, analyzer).ExecuteText(context.Background(), TextInput{Text: "despesas de março 2025"})
+	output, err := newUC(repo, analyzer).ExecuteText(context.Background(), TextInput{Text: "expenses for March 2025"})
 
 	if err != nil {
 		t.Fatalf("esperava sem erro, got: %v", err)
 	}
 	expectedMonth := time.Date(2025, time.March, 1, 0, 0, 0, 0, time.UTC)
 	if !capturedMonth.Equal(expectedMonth) {
-		t.Errorf("mês esperado %v, got %v", expectedMonth, capturedMonth)
+		t.Errorf("expected month %v, got %v", expectedMonth, capturedMonth)
 	}
 	if output.QueryMonth != "Março 2025" {
 		t.Errorf("QueryMonth esperado 'Março 2025', got '%s'", output.QueryMonth)
@@ -105,7 +105,7 @@ func TestProcessQuery_EmptyResult(t *testing.T) {
 		},
 	}
 
-	output, err := newUC(repo, analyzer).ExecuteText(context.Background(), TextInput{Text: "despesas de janeiro 2020"})
+	output, err := newUC(repo, analyzer).ExecuteText(context.Background(), TextInput{Text: "expenses for January 2020"})
 
 	if err != nil {
 		t.Fatalf("esperava sem erro, got: %v", err)
@@ -116,8 +116,8 @@ func TestProcessQuery_EmptyResult(t *testing.T) {
 	if output.QueryTotal != 0 {
 		t.Errorf("total esperado 0, got %.2f", output.QueryTotal)
 	}
-	if output.QueryMonth != "Janeiro 2020" {
-		t.Errorf("QueryMonth esperado 'Janeiro 2020', got '%s'", output.QueryMonth)
+	if output.QueryMonth != "January 2020" {
+		t.Errorf("QueryMonth expected 'January 2020', got '%s'", output.QueryMonth)
 	}
 }
 

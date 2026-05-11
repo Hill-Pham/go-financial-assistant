@@ -16,7 +16,7 @@ func (uc *AnalyzeExpense) processRecurring(
 	rawInput string,
 ) (*ExpenseOutput, error) {
 	if analysis.Amount == nil {
-		return nil, fmt.Errorf("valor não identificado para despesa recorrente")
+		return nil, fmt.Errorf("unable to identify value for recurring expense")
 	}
 
 	payment, err := parsePaymentMethod(paymentMethod)
@@ -40,7 +40,7 @@ func (uc *AnalyzeExpense) processRecurring(
 		rawInput,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("despesa recorrente inválida: %w", err)
+		return nil, fmt.Errorf("invalid recurring expense: %w", err)
 	}
 	purchase.DayOfMonth = &dayOfMonth
 
@@ -49,7 +49,7 @@ func (uc *AnalyzeExpense) processRecurring(
 	firstPayment.ReferenceMonth = &firstOfMonth
 
 	if err := uc.repo.Save(ctx, purchase, []domain.Payment{*firstPayment}); err != nil {
-		return nil, fmt.Errorf("erro ao salvar despesa recorrente: %w", err)
+		return nil, fmt.Errorf("error when saving recurring expense: %w", err)
 	}
 
 	return &ExpenseOutput{
@@ -73,25 +73,25 @@ func (uc *AnalyzeExpense) processCancel(ctx context.Context, analysis *ports.Exp
 	}
 
 	if searchDesc == "" {
-		return nil, fmt.Errorf("não foi possível identificar qual despesa recorrente cancelar")
+		return nil, fmt.Errorf("unable to identify which recurring expense to cancel")
 	}
 
 	matches, err := uc.repo.FindByDescription(ctx, searchDesc)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao buscar despesa recorrente: %w", err)
+		return nil, fmt.Errorf("error when searching for recurring expense: %w", err)
 	}
 	if len(matches) == 0 {
-		return nil, fmt.Errorf("nenhuma despesa recorrente ativa encontrada com descrição '%s'", searchDesc)
+		return nil, fmt.Errorf("no active recurring expense found with description '%s'", searchDesc)
 	}
 	if len(matches) > 1 {
-		uc.logger.Warn("múltiplas despesas recorrentes encontradas, cancelando a primeira", "description", searchDesc, "count", len(matches))
+		uc.logger.Warn("multiple recurring expenses found, canceling the first", "description", searchDesc, "count", len(matches))
 	}
 
 	purchase := matches[0]
-	purchase.Cancel("cancelado pelo usuário")
+	purchase.Cancel("canceled by user")
 
 	if err := uc.repo.Update(ctx, &purchase); err != nil {
-		return nil, fmt.Errorf("erro ao cancelar despesa recorrente: %w", err)
+		return nil, fmt.Errorf("error when canceling recurring expense: %w", err)
 	}
 
 	cancelledDesc := descriptionOrFallback(purchase.Description, purchase.RawInput)

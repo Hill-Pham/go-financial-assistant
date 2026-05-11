@@ -55,10 +55,10 @@ func TestExportCSV_Filename(t *testing.T) {
 	_, filename, _, err := uc.Execute(context.Background(), time.Date(2025, 3, 1, 0, 0, 0, 0, time.UTC))
 
 	if err != nil {
-		t.Fatalf("erro inesperado: %v", err)
+		t.Fatalf("unexpected error: %v", err)
 	}
-	if filename != "despesas_março_2025.csv" {
-		t.Errorf("filename inesperado: %q", filename)
+	if filename != "expenses_march_2025.csv" {
+		t.Errorf("unexpected filename: %q", filename)
 	}
 }
 
@@ -70,7 +70,7 @@ func TestExportCSV_HasBOM(t *testing.T) {
 
 	bom := []byte{0xEF, 0xBB, 0xBF}
 	if !bytes.HasPrefix(data, bom) {
-		t.Error("CSV deve começar com BOM UTF-8")
+		t.Error("CSV should start with UTF-8 BOM")
 	}
 }
 
@@ -82,13 +82,13 @@ func TestExportCSV_Header(t *testing.T) {
 
 	records := parseCSV(t, data)
 	if len(records) < 1 {
-		t.Fatal("CSV sem linhas")
+		t.Fatal("CSV has no rows")
 	}
 	header := records[0]
-	expected := []string{"Data", "Descrição", "Categoria", "Forma de Pagamento", "Tipo", "Parcela", "Valor (R$)"}
+	expected := []string{"Date", "Description", "Category", "Payment Method", "Type", "Installment", "Amount (R$)"}
 	for i, col := range expected {
 		if i >= len(header) || header[i] != col {
-			t.Errorf("coluna %d: esperava %q, got %q", i, col, header[i])
+			t.Errorf("column %d: expected %q, got %q", i, col, header[i])
 		}
 	}
 }
@@ -96,7 +96,7 @@ func TestExportCSV_Header(t *testing.T) {
 func TestExportCSV_SingleRow(t *testing.T) {
 	due := time.Date(2025, 3, 15, 0, 0, 0, 0, time.UTC)
 	detail := ports.PaymentDetail{
-		Description:   strPtr("Almoço"),
+		Description:   strPtr("Lunch"),
 		Category:      "FOOD",
 		PaymentMethod: "PIX",
 		Amount:        45.50,
@@ -116,25 +116,25 @@ func TestExportCSV_SingleRow(t *testing.T) {
 
 	row := records[1]
 	if row[0] != "15/03/2025" {
-		t.Errorf("data: esperava 15/03/2025, got %q", row[0])
+		t.Errorf("date: expected 15/03/2025, got %q", row[0])
 	}
-	if row[1] != "Almoço" {
-		t.Errorf("descrição: esperava Almoço, got %q", row[1])
+	if row[1] != "Lunch" {
+		t.Errorf("description: expected Lunch, got %q", row[1])
 	}
-	if row[2] != "Alimentação" {
-		t.Errorf("categoria: esperava Alimentação, got %q", row[2])
+	if row[2] != "Food" {
+		t.Errorf("category: expected Food, got %q", row[2])
 	}
 	if row[3] != "Pix" {
-		t.Errorf("forma pagamento: esperava Pix, got %q", row[3])
+		t.Errorf("payment method: expected Pix, got %q", row[3])
 	}
-	if row[4] != "Único" {
-		t.Errorf("tipo: esperava Único, got %q", row[4])
+	if row[4] != "Single" {
+		t.Errorf("type: expected Single, got %q", row[4])
 	}
 	if row[5] != "-" {
-		t.Errorf("parcela: esperava -, got %q", row[5])
+		t.Errorf("installment: expected -, got %q", row[5])
 	}
 	if row[6] != "45.50" {
-		t.Errorf("valor: esperava 45.50, got %q", row[6])
+		t.Errorf("amount: expected 45.50, got %q", row[6])
 	}
 }
 

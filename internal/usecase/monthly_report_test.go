@@ -57,16 +57,16 @@ func TestMonthlyReport_SendsDocument(t *testing.T) {
 	}
 	exporter := &mockCSVExporterUC{
 		executeFn: func(_ context.Context, _ time.Time) ([]byte, string, *ExportSummary, error) {
-			return []byte("csv content"), "despesas_fevereiro_2025.csv", nil, nil
+			return []byte("csv content"), "expenses_february_2025.csv", nil, nil
 		},
 	}
 
 	r := NewMonthlyReport(exporter, messenger, "5511999999999", silentReportLogger())
 	if err := r.Send(context.Background()); err != nil {
-		t.Fatalf("erro inesperado: %v", err)
+		t.Fatalf("unexpected error: %v", err)
 	}
 	if !documentSent {
-		t.Error("SendDocument não foi chamado")
+		t.Error("SendDocument was not called")
 	}
 }
 
@@ -86,10 +86,10 @@ func TestMonthlyReport_EmptyMonth_DoesNotSend(t *testing.T) {
 
 	r := NewMonthlyReport(exporter, messenger, "5511999999999", silentReportLogger())
 	if err := r.Send(context.Background()); err != nil {
-		t.Fatalf("erro inesperado: %v", err)
+		t.Fatalf("unexpected error: %v", err)
 	}
 	if documentSent {
-		t.Error("SendDocument não deve ser chamado quando não há despesas")
+		t.Error("SendDocument should not be called when there are no expenses.")
 	}
 }
 
@@ -102,7 +102,7 @@ func TestMonthlyReport_ExporterError_ReturnsError(t *testing.T) {
 
 	r := NewMonthlyReport(exporter, &mockMessengerUC{}, "5511999999999", silentReportLogger())
 	if err := r.Send(context.Background()); err == nil {
-		t.Error("esperava erro do exporter")
+		t.Error("expected exporter error")
 	}
 }
 
@@ -120,7 +120,7 @@ func TestMonthlyReport_MessengerError_ReturnsError(t *testing.T) {
 
 	r := NewMonthlyReport(exporter, messenger, "5511999999999", silentReportLogger())
 	if err := r.Send(context.Background()); err == nil {
-		t.Error("esperava erro do messenger")
+		t.Error("expected messenger error")
 	}
 }
 
@@ -142,6 +142,6 @@ func TestMonthlyReport_UsesCorrectPhone(t *testing.T) {
 	r.Send(context.Background()) //nolint:errcheck
 
 	if phoneSent != "5511888888888" {
-		t.Errorf("phone: esperava 5511888888888, got %q", phoneSent)
+		t.Errorf("phone: expected 5511888888888, got %q", phoneSent)
 	}
 }
