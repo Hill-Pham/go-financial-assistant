@@ -1,4 +1,4 @@
-package httpserver
+﻿package httpserver
 
 import (
 	"net/http"
@@ -22,10 +22,10 @@ func TestWebhookSourceMiddleware_AllowsKnownHost(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if !reached {
-		t.Error("esperava que a requisição passasse pelo middleware")
+		t.Error("expected que a requisiĂ§Ă£o passasse pelo middleware")
 	}
 	if rr.Code != http.StatusOK {
-		t.Errorf("esperava 200, got %d", rr.Code)
+		t.Errorf("expected 200, got %d", rr.Code)
 	}
 }
 
@@ -41,10 +41,10 @@ func TestWebhookSourceMiddleware_BlocksUnknownIP(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if reached {
-		t.Error("IP externo não deveria passar pelo middleware")
+		t.Error("IP externo not should passar pelo middleware")
 	}
 	if rr.Code != http.StatusForbidden {
-		t.Errorf("esperava 403, got %d", rr.Code)
+		t.Errorf("expected 403, got %d", rr.Code)
 	}
 }
 
@@ -60,10 +60,10 @@ func TestWebhookSourceMiddleware_BlocksUnresolvableHost(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if reached {
-		t.Error("host inresolvável deveria bloquear a requisição")
+		t.Error("host inresolvĂ¡vel should bloquear a requisiĂ§Ă£o")
 	}
 	if rr.Code != http.StatusForbidden {
-		t.Errorf("esperava 403, got %d", rr.Code)
+		t.Errorf("expected 403, got %d", rr.Code)
 	}
 }
 
@@ -79,10 +79,10 @@ func TestWebhookSourceMiddleware_BlocksMalformedRemoteAddr(t *testing.T) {
 	handler.ServeHTTP(rr, req)
 
 	if reached {
-		t.Error("RemoteAddr malformado deveria bloquear a requisição")
+		t.Error("RemoteAddr malformado should bloquear a requisiĂ§Ă£o")
 	}
 	if rr.Code != http.StatusForbidden {
-		t.Errorf("esperava 403, got %d", rr.Code)
+		t.Errorf("expected 403, got %d", rr.Code)
 	}
 }
 
@@ -91,7 +91,7 @@ func TestIPRateLimiter_AllowsUnderLimit(t *testing.T) {
 
 	for i := range 3 {
 		if !rl.allow("1.2.3.4") {
-			t.Errorf("requisição %d deveria ser permitida", i+1)
+			t.Errorf("requisiĂ§Ă£o %d should be permitida", i+1)
 		}
 	}
 }
@@ -103,7 +103,7 @@ func TestIPRateLimiter_BlocksOverLimit(t *testing.T) {
 		rl.allow("1.2.3.4")
 	}
 	if rl.allow("1.2.3.4") {
-		t.Error("4ª requisição deveria ser bloqueada")
+		t.Error("4th request should be blocked")
 	}
 }
 
@@ -114,7 +114,7 @@ func TestIPRateLimiter_IsolatesIPs(t *testing.T) {
 	rl.allow("1.1.1.1")
 
 	if !rl.allow("2.2.2.2") {
-		t.Error("IP diferente deveria ter seu próprio limite")
+		t.Error("IP diferente should ter seu prĂ³prio limite")
 	}
 }
 
@@ -127,7 +127,7 @@ func TestIPRateLimiter_ResetsAfterWindow(t *testing.T) {
 	time.Sleep(60 * time.Millisecond)
 
 	if !rl.allow("1.2.3.4") {
-		t.Error("após a janela expirar, requisição deveria ser permitida novamente")
+		t.Error("after a janela expirar, requisiĂ§Ă£o should be permitida novamente")
 	}
 }
 
@@ -145,6 +145,6 @@ func TestAdminRateLimitMiddleware_Returns429WhenLimitExceeded(t *testing.T) {
 	}
 
 	if calls != 2 {
-		t.Errorf("esperava 2 chamadas passadas, got %d", calls)
+		t.Errorf("expected 2 chamadas passadas, got %d", calls)
 	}
 }

@@ -1,4 +1,4 @@
-package httpserver
+﻿package httpserver
 
 import (
 	"context"
@@ -47,7 +47,7 @@ func TestQRCodeHandler_DisabledWhenNoSecret(t *testing.T) {
 	rr := doQRRequestHeader(h, "")
 
 	if rr.Code != http.StatusServiceUnavailable {
-		t.Errorf("esperava 503, got %d", rr.Code)
+		t.Errorf("expected 503, got %d", rr.Code)
 	}
 }
 
@@ -55,10 +55,10 @@ func TestQRCodeHandler_UnauthorizedWhenWrongSecret(t *testing.T) {
 	h := &qrcodeHandler{secret: "correct-secret", qrProvider: &mockQRProvider{}}
 
 	if rr := doQRRequestHeader(h, "wrong-secret"); rr.Code != http.StatusUnauthorized {
-		t.Errorf("header: esperava 401, got %d", rr.Code)
+		t.Errorf("header: expected 401, got %d", rr.Code)
 	}
 	if rr := doQRRequestQuery(h, "wrong-secret"); rr.Code != http.StatusUnauthorized {
-		t.Errorf("query: esperava 401, got %d", rr.Code)
+		t.Errorf("query: expected 401, got %d", rr.Code)
 	}
 }
 
@@ -72,7 +72,7 @@ func TestQRCodeHandler_AuthorizationHeader(t *testing.T) {
 	rr := doQRRequestHeader(h, "my-secret")
 
 	if rr.Code != http.StatusOK {
-		t.Errorf("esperava 200 com Authorization header, got %d", rr.Code)
+		t.Errorf("expected 200 com Authorization header, got %d", rr.Code)
 	}
 }
 
@@ -86,7 +86,7 @@ func TestQRCodeHandler_QueryParamFallback(t *testing.T) {
 	rr := doQRRequestQuery(h, "my-secret")
 
 	if rr.Code != http.StatusOK {
-		t.Errorf("esperava 200 com query param, got %d", rr.Code)
+		t.Errorf("expected 200 com query form, got %d", rr.Code)
 	}
 }
 
@@ -100,14 +100,14 @@ func TestQRCodeHandler_AlreadyConnected(t *testing.T) {
 	rr := doQRRequestHeader(h, "my-secret")
 
 	if rr.Code != http.StatusOK {
-		t.Errorf("esperava 200, got %d", rr.Code)
+		t.Errorf("expected 200, got %d", rr.Code)
 	}
 	var body map[string]any
 	if err := json.Unmarshal(rr.Body.Bytes(), &body); err != nil {
-		t.Fatalf("resposta não é JSON: %v", err)
+		t.Fatalf("resposta not is JSON: %v", err)
 	}
 	if body["connected"] != true {
-		t.Errorf("esperava connected=true, got %v", body["connected"])
+		t.Errorf("expected connected=true, got %v", body["connected"])
 	}
 }
 
@@ -123,13 +123,13 @@ func TestQRCodeHandler_ReturnsHTMLWithQR(t *testing.T) {
 	rr := doQRRequestHeader(h, "my-secret")
 
 	if rr.Code != http.StatusOK {
-		t.Errorf("esperava 200, got %d", rr.Code)
+		t.Errorf("expected 200, got %d", rr.Code)
 	}
 	if ct := rr.Header().Get("Content-Type"); !strings.HasPrefix(ct, "text/html") {
-		t.Errorf("esperava Content-Type text/html, got %q", ct)
+		t.Errorf("expected Content-Type text/html, got %q", ct)
 	}
 	if !strings.Contains(rr.Body.String(), fakeBase64) {
-		t.Error("HTML não contém o base64 do QR code")
+		t.Error("HTML not contism o base64 do QR code")
 	}
 }
 
@@ -142,7 +142,7 @@ func TestQRCodeHandler_EmptyBase64Returns503(t *testing.T) {
 		},
 	}
 	if rr := doQRRequestHeader(h, "my-secret"); rr.Code != http.StatusServiceUnavailable {
-		t.Errorf("esperava 503 para base64 vazio, got %d", rr.Code)
+		t.Errorf("expected 503 for base64 empty, got %d", rr.Code)
 	}
 }
 
@@ -154,6 +154,9 @@ func TestQRCodeHandler_StateErrorReturns500(t *testing.T) {
 		},
 	}
 	if rr := doQRRequestHeader(h, "my-secret"); rr.Code != http.StatusInternalServerError {
-		t.Errorf("esperava 500, got %d", rr.Code)
+		t.Errorf("expected 500, got %d", rr.Code)
 	}
 }
+
+
+

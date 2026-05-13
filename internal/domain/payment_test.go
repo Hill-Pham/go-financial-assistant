@@ -1,4 +1,4 @@
-package domain
+﻿package domain
 
 import (
 	"testing"
@@ -11,19 +11,19 @@ func TestNewPayment_Paid(t *testing.T) {
 	p := NewPayment(purchaseID, 100.0, PaymentStatusPaid)
 
 	if p.PurchaseID != purchaseID {
-		t.Errorf("PurchaseID incorreto")
+		t.Errorf("PurchaseID incorrect")
 	}
 	if p.Amount != 100.0 {
-		t.Errorf("amount esperado 100.0, got %v", p.Amount)
+		t.Errorf("amount expected 100.0, got %v", p.Amount)
 	}
 	if p.Status != PaymentStatusPaid {
-		t.Errorf("status esperado PAID, got %s", p.Status)
+		t.Errorf("status expected PAID, got %s", p.Status)
 	}
 	if p.PaidAt == nil {
-		t.Error("PaidAt deveria estar preenchido para status PAID")
+		t.Error("PaidAt should be preenchido for status PAID")
 	}
 	if p.ID.String() == "" {
-		t.Error("ID não deveria ser vazio")
+		t.Error("ID not should be empty")
 	}
 }
 
@@ -31,10 +31,10 @@ func TestNewPayment_Pending(t *testing.T) {
 	p := NewPayment(uuid.New(), 50.0, PaymentStatusPending)
 
 	if p.Status != PaymentStatusPending {
-		t.Errorf("status esperado PENDING, got %s", p.Status)
+		t.Errorf("status expected PENDING, got %s", p.Status)
 	}
 	if p.PaidAt != nil {
-		t.Error("PaidAt deveria ser nil para status PENDING")
+		t.Error("PaidAt should be nil for status PENDING")
 	}
 }
 
@@ -42,9 +42,11 @@ func TestNewPayment_Cancelled(t *testing.T) {
 	p := NewPayment(uuid.New(), 50.0, PaymentStatusCancelled)
 
 	if p.Status != PaymentStatusCancelled {
-		t.Errorf("status esperado CANCELLED, got %s", p.Status)
+		t.Errorf("status expected CANCELLED, got %s", p.Status)
 	}
 	if p.PaidAt != nil {
-		t.Error("PaidAt deveria ser nil para status CANCELLED")
+		t.Error("PaidAt should be nil for status CANCELLED")
 	}
 }
+
+

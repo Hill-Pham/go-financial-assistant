@@ -1,4 +1,4 @@
-package usecase
+﻿package usecase
 
 import (
 	"context"
@@ -13,28 +13,28 @@ func TestExecuteText_Success(t *testing.T) {
 	uc := newUC(
 		successRepo(),
 		&mockAnalyzer{analyzeTextFn: func(_ context.Context, _ string) (*ports.ExpenseAnalysis, error) {
-			return singleAnalysis(50.0, "Almoço", "FOOD", 0.95), nil
+			return singleAnalysis(50.0, "AlmoĂ§o", "FOOD", 0.95), nil
 		}},
 	)
 
-	out, err := uc.ExecuteText(context.Background(), TextInput{Text: "gastei 50 no almoço pix"})
+	out, err := uc.ExecuteText(context.Background(), TextInput{Text: "spent 50 no almoĂ§o pix"})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if out.Amount != 50.0 {
-		t.Errorf("amount esperado 50.0, got %v", out.Amount)
+		t.Errorf("amount expected 50.0, got %v", out.Amount)
 	}
-	if out.Payment != "Pix" {
-		t.Errorf("payment esperado Pix, got %s", out.Payment)
+	if out.Payment != "PIX" {
+		t.Errorf("payment expected PIX, got %s", out.Payment)
 	}
-	if out.Category != "Alimentação" {
-		t.Errorf("category esperada Alimentação, got %s", out.Category)
+	if out.Category != "Food" {
+		t.Errorf("category expected Food, got %s", out.Category)
 	}
 	if out.Confidence != 0.95 {
-		t.Errorf("confidence esperada 0.95, got %v", out.Confidence)
+		t.Errorf("confidence expected 0.95, got %v", out.Confidence)
 	}
 	if out.Type != "SINGLE" {
-		t.Errorf("type esperado SINGLE, got %s", out.Type)
+		t.Errorf("type expected SINGLE, got %s", out.Type)
 	}
 }
 
@@ -48,7 +48,7 @@ func TestExecuteText_AnalyzerError(t *testing.T) {
 
 	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "qualquer coisa"})
 	if err == nil {
-		t.Fatal("esperava erro")
+		t.Fatal("expected erro")
 	}
 }
 
@@ -62,7 +62,7 @@ func TestExecuteText_AmountNil(t *testing.T) {
 
 	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "texto"})
 	if err == nil {
-		t.Fatal("esperava erro de valor nil")
+		t.Fatal("expected error for valor nil")
 	}
 }
 
@@ -81,7 +81,7 @@ func TestExecuteText_RepoSaveError(t *testing.T) {
 
 	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "taxi debito"})
 	if err == nil {
-		t.Fatal("esperava erro do repo")
+		t.Fatal("expected error from repo")
 	}
 }
 
@@ -96,10 +96,10 @@ func TestExecuteText_DescriptionFallsBackToRawInput(t *testing.T) {
 
 	out, err := uc.ExecuteText(context.Background(), TextInput{Text: "dinheiro"})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if out.Description != "dinheiro" {
-		t.Errorf("description esperada 'dinheiro', got '%s'", out.Description)
+		t.Errorf("description expected 'dinheiro', got '%s'", out.Description)
 	}
 }
 
@@ -112,12 +112,12 @@ func TestExecuteText_EmptyDescription_FallsBackToRawInput(t *testing.T) {
 		}},
 	)
 
-	out, err := uc.ExecuteText(context.Background(), TextInput{Text: "espécie"})
+	out, err := uc.ExecuteText(context.Background(), TextInput{Text: "espiscie"})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
-	if out.Description != "espécie" {
-		t.Errorf("description esperada 'espécie', got '%s'", out.Description)
+	if out.Description != "espiscie" {
+		t.Errorf("description expected 'espiscie', got '%s'", out.Description)
 	}
 }
 
@@ -129,18 +129,18 @@ func TestExecuteImage_Success(t *testing.T) {
 		}},
 	)
 
-	out, err := uc.ExecuteImage(context.Background(), ImageInput{ImageData: []byte{1, 2, 3}, MimeType: "image/jpeg", Caption: "crédito"})
+	out, err := uc.ExecuteImage(context.Background(), ImageInput{ImageData: []byte{1, 2, 3}, MimeType: "image/jpeg", Caption: "crisdito"})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if out.Amount != 120.0 {
-		t.Errorf("amount esperado 120.0, got %v", out.Amount)
+		t.Errorf("amount expected 120.0, got %v", out.Amount)
 	}
-	if out.Payment != "Cartão de Crédito" {
-		t.Errorf("payment esperado Cartão de Crédito, got %s", out.Payment)
+	if out.Payment != "CartĂ£o de Crisdito" {
+		t.Errorf("payment expected CartĂ£o de Crisdito, got %s", out.Payment)
 	}
 	if out.Category != "Compras" {
-		t.Errorf("category esperada Compras, got %s", out.Category)
+		t.Errorf("category expected Compras, got %s", out.Category)
 	}
 }
 
@@ -154,7 +154,7 @@ func TestExecuteImage_AnalyzerError(t *testing.T) {
 
 	_, err := uc.ExecuteImage(context.Background(), ImageInput{ImageData: []byte{}, MimeType: "image/png"})
 	if err == nil {
-		t.Fatal("esperava erro")
+		t.Fatal("expected erro")
 	}
 }
 
@@ -178,10 +178,10 @@ func TestExecuteImage_RawInputFormat(t *testing.T) {
 
 	_, err := uc.ExecuteImage(context.Background(), ImageInput{ImageData: []byte{1}, MimeType: "image/png", Caption: ""})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if capturedRawInput != "[imagem: image/png]" {
-		t.Errorf("rawInput esperado '[imagem: image/png]', got '%s'", capturedRawInput)
+		t.Errorf("rawInput expected '[imagem: image/png]', got '%s'", capturedRawInput)
 	}
 }
 
@@ -191,19 +191,19 @@ func TestInferPaymentMethod(t *testing.T) {
 		expected string
 	}{
 		{"paguei via PIX", "PIX"},
-		{"no crédito", "CREDIT_CARD"},
-		{"cartão de credito", "CREDIT_CARD"},
-		{"débito", "DEBIT_CARD"},
+		{"no crisdito", "CREDIT_CARD"},
+		{"cartĂ£o de credito", "CREDIT_CARD"},
+		{"disbito", "DEBIT_CARD"},
 		{"paguei no debito", "DEBIT_CARD"},
 		{"dinheiro vivo", "CASH"},
 		{"pagamento em especie", "CASH"},
-		{"pagamento em espécie", "CASH"},
+		{"pagamento em espiscie", "CASH"},
 		{"sem info", "OTHER"},
 	}
 	for _, c := range cases {
 		got := inferPaymentMethod(c.input)
 		if got != c.expected {
-			t.Errorf("inferPaymentMethod(%q) = %q, esperado %q", c.input, got, c.expected)
+			t.Errorf("inferPaymentMethod(%q) = %q, expected %q", c.input, got, c.expected)
 		}
 	}
 }
@@ -226,15 +226,15 @@ func TestParsePaymentMethod(t *testing.T) {
 		got, err := parsePaymentMethod(c.input)
 		if c.wantErr {
 			if err == nil {
-				t.Errorf("parsePaymentMethod(%q): esperava erro", c.input)
+				t.Errorf("parsePaymentMethod(%q): expected erro", c.input)
 			}
 			continue
 		}
 		if err != nil {
-			t.Errorf("parsePaymentMethod(%q): erro inesperado: %v", c.input, err)
+			t.Errorf("parsePaymentMethod(%q): erro inexpected: %v", c.input, err)
 		}
 		if got != c.expected {
-			t.Errorf("parsePaymentMethod(%q) = %q, esperado %q", c.input, got, c.expected)
+			t.Errorf("parsePaymentMethod(%q) = %q, expected %q", c.input, got, c.expected)
 		}
 	}
 }
@@ -259,7 +259,7 @@ func TestParseCategory(t *testing.T) {
 			if c.input != nil {
 				label = *c.input
 			}
-			t.Errorf("parseCategory(%s) = %q, esperado %q", label, got, c.expected)
+			t.Errorf("parseCategory(%s) = %q, expected %q", label, got, c.expected)
 		}
 	}
 }
@@ -278,7 +278,7 @@ func TestResolvePaymentMethod(t *testing.T) {
 	for _, c := range cases {
 		got := resolvePaymentMethod(c.aiSuggestion, c.fallback)
 		if got != c.expected {
-			t.Errorf("resolvePaymentMethod(%v, %q) = %q, esperado %q", c.aiSuggestion, c.fallback, got, c.expected)
+			t.Errorf("resolvePaymentMethod(%v, %q) = %q, expected %q", c.aiSuggestion, c.fallback, got, c.expected)
 		}
 	}
 }
@@ -289,10 +289,10 @@ func TestProcessAnalysis_InvalidPaymentMethod(t *testing.T) {
 
 	_, err := uc.processAnalysis(context.Background(), analysis, "INVALIDO", "raw")
 	if err == nil {
-		t.Fatal("esperava erro de método de pagamento inválido")
+		t.Fatal("expected error for mistodo de pagamento invalid")
 	}
 	if !errors.Is(err, domain.ErrInvalidPaymentMethod) {
-		t.Errorf("esperava ErrInvalidPaymentMethod, got: %v", err)
+		t.Errorf("expected ErrInvalidPaymentMethod, got: %v", err)
 	}
 }
 
@@ -302,6 +302,6 @@ func TestProcessAnalysis_InvalidAmount(t *testing.T) {
 
 	_, err := uc.processAnalysis(context.Background(), analysis, "PIX", "raw")
 	if err == nil {
-		t.Fatal("esperava erro de despesa inválida")
+		t.Fatal("expected error for expense invalid")
 	}
 }

@@ -1,4 +1,4 @@
-package usecase
+﻿package usecase
 
 import (
 	"context"
@@ -28,7 +28,7 @@ func (m *mockMessengerUC) SendDocument(ctx context.Context, to, filename, base64
 	return "", nil
 }
 
-func (m *mockMessengerUC) FetchImageBase64(ctx context.Context, remoteJid string, fromMe bool, messageID string) (string, error) {
+func (m *mockMessengerUC) FetchImageBase64(ctx context.Context, remoteJid string, fromMe bool, monthsageID string) (string, error) {
 	return "", nil
 }
 
@@ -49,7 +49,7 @@ func silentReportLogger() *slog.Logger {
 
 func TestMonthlyReport_SendsDocument(t *testing.T) {
 	documentSent := false
-	messenger := &mockMessengerUC{
+	monthsenger := &mockMessengerUC{
 		sendDocumentFn: func(_ context.Context, _, _, _, _ string) (string, error) {
 			documentSent = true
 			return "msg-id", nil
@@ -61,7 +61,7 @@ func TestMonthlyReport_SendsDocument(t *testing.T) {
 		},
 	}
 
-	r := NewMonthlyReport(exporter, messenger, "5511999999999", silentReportLogger())
+	r := NewMonthlyReport(exporter, monthsenger, "5511999999999", silentReportLogger())
 	if err := r.Send(context.Background()); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -72,7 +72,7 @@ func TestMonthlyReport_SendsDocument(t *testing.T) {
 
 func TestMonthlyReport_EmptyMonth_DoesNotSend(t *testing.T) {
 	documentSent := false
-	messenger := &mockMessengerUC{
+	monthsenger := &mockMessengerUC{
 		sendDocumentFn: func(_ context.Context, _, _, _, _ string) (string, error) {
 			documentSent = true
 			return "", nil
@@ -84,7 +84,7 @@ func TestMonthlyReport_EmptyMonth_DoesNotSend(t *testing.T) {
 		},
 	}
 
-	r := NewMonthlyReport(exporter, messenger, "5511999999999", silentReportLogger())
+	r := NewMonthlyReport(exporter, monthsenger, "5511999999999", silentReportLogger())
 	if err := r.Send(context.Background()); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -107,7 +107,7 @@ func TestMonthlyReport_ExporterError_ReturnsError(t *testing.T) {
 }
 
 func TestMonthlyReport_MessengerError_ReturnsError(t *testing.T) {
-	messenger := &mockMessengerUC{
+	monthsenger := &mockMessengerUC{
 		sendDocumentFn: func(_ context.Context, _, _, _, _ string) (string, error) {
 			return "", errors.New("whatsapp error")
 		},
@@ -118,15 +118,15 @@ func TestMonthlyReport_MessengerError_ReturnsError(t *testing.T) {
 		},
 	}
 
-	r := NewMonthlyReport(exporter, messenger, "5511999999999", silentReportLogger())
+	r := NewMonthlyReport(exporter, monthsenger, "5511999999999", silentReportLogger())
 	if err := r.Send(context.Background()); err == nil {
-		t.Error("expected messenger error")
+		t.Error("expected monthsenger error")
 	}
 }
 
 func TestMonthlyReport_UsesCorrectPhone(t *testing.T) {
 	phoneSent := ""
-	messenger := &mockMessengerUC{
+	monthsenger := &mockMessengerUC{
 		sendDocumentFn: func(_ context.Context, to, _, _, _ string) (string, error) {
 			phoneSent = to
 			return "", nil
@@ -138,10 +138,11 @@ func TestMonthlyReport_UsesCorrectPhone(t *testing.T) {
 		},
 	}
 
-	r := NewMonthlyReport(exporter, messenger, "5511888888888", silentReportLogger())
+	r := NewMonthlyReport(exporter, monthsenger, "5511888888888", silentReportLogger())
 	r.Send(context.Background()) //nolint:errcheck
 
 	if phoneSent != "5511888888888" {
 		t.Errorf("phone: expected 5511888888888, got %q", phoneSent)
 	}
 }
+

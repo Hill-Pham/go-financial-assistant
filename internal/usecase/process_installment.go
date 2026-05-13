@@ -1,4 +1,4 @@
-package usecase
+﻿package usecase
 
 import (
 	"context"
@@ -16,7 +16,7 @@ func (uc *AnalyzeExpense) processInstallment(
 	rawInput string,
 ) (*ExpenseOutput, error) {
 	if analysis.Amount == nil {
-		return nil, fmt.Errorf("valor total não identificado para compra parcelada")
+		return nil, fmt.Errorf("valor total nĂ£o identificado para compra parcelada")
 	}
 	if analysis.Installments == nil || analysis.Installments.Total <= 0 {
 		return uc.processAnalysis(ctx, analysis, paymentMethod, rawInput)
@@ -43,7 +43,7 @@ func (uc *AnalyzeExpense) processInstallment(
 		rawInput,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("compra parcelada inválida: %w", err)
+		return nil, fmt.Errorf("compra parcelada invĂ¡lida: %w", err)
 	}
 	purchase.InstallmentCount = &n
 	purchase.InstallmentAmount = &installmentAmount
@@ -60,7 +60,7 @@ func (uc *AnalyzeExpense) processInstallment(
 	}
 
 	if err := uc.repo.Save(ctx, purchase, payments); err != nil {
-		return nil, fmt.Errorf("erro ao salvar compra parcelada: %w", err)
+		return nil, fmt.Errorf("error saving installment purchase: %w", err)
 	}
 
 	return &ExpenseOutput{
@@ -75,3 +75,4 @@ func (uc *AnalyzeExpense) processInstallment(
 		InstallmentAmount: installmentAmount,
 	}, nil
 }
+

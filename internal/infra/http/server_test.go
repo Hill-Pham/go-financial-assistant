@@ -1,4 +1,4 @@
-package httpserver
+﻿package httpserver
 
 import (
 	"context"
@@ -18,7 +18,7 @@ func TestHandle_InvalidJSON(t *testing.T) {
 	h := newHandler(&mockAnalyzer{}, &mockMessenger{})
 	rr := doRequest(h, []byte("not json"))
 	if rr.Code != 400 {
-		t.Errorf("esperava 400, got %d", rr.Code)
+		t.Errorf("expected 400, got %d", rr.Code)
 	}
 }
 
@@ -28,7 +28,7 @@ func TestHandle_InvalidBody(t *testing.T) {
 	rr := httptest.NewRecorder()
 	h.Handle(rr, req)
 	if rr.Code != 400 {
-		t.Errorf("esperava 400, got %d", rr.Code)
+		t.Errorf("expected 400, got %d", rr.Code)
 	}
 }
 
@@ -41,10 +41,10 @@ func TestHandle_BotMessageDedup(t *testing.T) {
 	rr := doRequest(h, body)
 
 	if rr.Code != 200 {
-		t.Errorf("esperava 200, got %d", rr.Code)
+		t.Errorf("expected 200, got %d", rr.Code)
 	}
 	if _, still := h.sentIDs.Load("MSG-BOT"); still {
-		t.Error("LoadAndDelete deveria ter removido a entrada")
+		t.Error("LoadAndDelete should ter removido a income entry")
 	}
 }
 
@@ -57,10 +57,10 @@ func TestHandle_AlreadyProcessed(t *testing.T) {
 	rr2 := doRequest(h, body)
 
 	if rr1.Code != 200 {
-		t.Errorf("primeira: esperava 200, got %d", rr1.Code)
+		t.Errorf("primeira: expected 200, got %d", rr1.Code)
 	}
 	if rr2.Code != 200 {
-		t.Errorf("duplicada: esperava 200, got %d", rr2.Code)
+		t.Errorf("duplicada: expected 200, got %d", rr2.Code)
 	}
 }
 
@@ -70,7 +70,7 @@ func TestHandle_NotAllowedNumber(t *testing.T) {
 		evolutionMessage{Conversation: "oi"}, "")
 	rr := doRequest(h, body)
 	if rr.Code != 200 {
-		t.Errorf("esperava 200 (ignorado), got %d", rr.Code)
+		t.Errorf("expected 200 (ignored), got %d", rr.Code)
 	}
 }
 
@@ -81,10 +81,10 @@ func TestHandle_TextMessage_Success(t *testing.T) {
 		},
 	}
 	body := buildPayload("inst", "5511888888888@s.whatsapp.net", "MSG-1", false,
-		evolutionMessage{Conversation: "gastei 50 pix"}, "")
+		evolutionMessage{Conversation: "spent 50 pix"}, "")
 	rr := doRequest(newHandler(analyzer, &mockMessenger{}), body)
 	if rr.Code != 201 {
-		t.Errorf("esperava 201, got %d", rr.Code)
+		t.Errorf("expected 201, got %d", rr.Code)
 	}
 }
 
@@ -98,7 +98,7 @@ func TestHandle_TextMessage_AllowedNumber(t *testing.T) {
 		evolutionMessage{Conversation: "50 pix"}, "")
 	rr := doRequest(newHandler(analyzer, &mockMessenger{}), body)
 	if rr.Code != 201 {
-		t.Errorf("esperava 201, got %d", rr.Code)
+		t.Errorf("expected 201, got %d", rr.Code)
 	}
 }
 
@@ -115,10 +115,10 @@ func TestHandle_ExtendedTextMessage(t *testing.T) {
 	rr := doRequest(newHandler(analyzer, &mockMessenger{}), body)
 
 	if rr.Code != 201 {
-		t.Errorf("esperava 201, got %d", rr.Code)
+		t.Errorf("expected 201, got %d", rr.Code)
 	}
 	if capturedText != "texto longo" {
-		t.Errorf("texto esperado 'texto longo', got '%s'", capturedText)
+		t.Errorf("texto expected 'texto longo', got '%s'", capturedText)
 	}
 }
 
@@ -127,7 +127,7 @@ func TestHandle_EmptyText_UnsupportedMessage(t *testing.T) {
 		evolutionMessage{}, "")
 	rr := doRequest(newHandler(&mockAnalyzer{}, &mockMessenger{}), body)
 	if rr.Code != 400 {
-		t.Errorf("esperava 400, got %d", rr.Code)
+		t.Errorf("expected 400, got %d", rr.Code)
 	}
 }
 
@@ -142,7 +142,7 @@ func TestHandle_ImageMessage_WithBase64(t *testing.T) {
 		evolutionMessage{ImageMessage: &evolutionImageMessage{Mimetype: "image/jpeg", Caption: "nota"}}, b64)
 	rr := doRequest(newHandler(analyzer, &mockMessenger{}), body)
 	if rr.Code != 201 {
-		t.Errorf("esperava 201, got %d", rr.Code)
+		t.Errorf("expected 201, got %d", rr.Code)
 	}
 }
 
@@ -153,30 +153,30 @@ func TestHandle_ImageMessage_FetchBase64(t *testing.T) {
 			return defaultOutput(), nil
 		},
 	}
-	messenger := &mockMessenger{
+	monthsenger := &mockMessenger{
 		fetchImageBase64Fn: func(_ context.Context, _ string, _ bool, _ string) (string, error) {
 			return b64, nil
 		},
 	}
 	body := buildPayload("inst", "5511888888888@s.whatsapp.net", "MSG-IMG2", false,
 		evolutionMessage{ImageMessage: &evolutionImageMessage{Mimetype: "image/png"}}, "")
-	rr := doRequest(newHandler(analyzer, messenger), body)
+	rr := doRequest(newHandler(analyzer, monthsenger), body)
 	if rr.Code != 201 {
-		t.Errorf("esperava 201, got %d", rr.Code)
+		t.Errorf("expected 201, got %d", rr.Code)
 	}
 }
 
 func TestHandle_ImageMessage_FetchBase64_Error(t *testing.T) {
-	messenger := &mockMessenger{
+	monthsenger := &mockMessenger{
 		fetchImageBase64Fn: func(_ context.Context, _ string, _ bool, _ string) (string, error) {
 			return "", errors.New("fetch failed")
 		},
 	}
 	body := buildPayload("inst", "5511888888888@s.whatsapp.net", "MSG-IMG3", false,
 		evolutionMessage{ImageMessage: &evolutionImageMessage{Mimetype: "image/png"}}, "")
-	rr := doRequest(newHandler(&mockAnalyzer{}, messenger), body)
+	rr := doRequest(newHandler(&mockAnalyzer{}, monthsenger), body)
 	if rr.Code != 400 {
-		t.Errorf("esperava 400, got %d", rr.Code)
+		t.Errorf("expected 400, got %d", rr.Code)
 	}
 }
 
@@ -185,7 +185,7 @@ func TestHandle_ImageMessage_InvalidBase64(t *testing.T) {
 		evolutionMessage{ImageMessage: &evolutionImageMessage{Mimetype: "image/png"}}, "!!!invalid!!!")
 	rr := doRequest(newHandler(&mockAnalyzer{}, &mockMessenger{}), body)
 	if rr.Code != 400 {
-		t.Errorf("esperava 400, got %d", rr.Code)
+		t.Errorf("expected 400, got %d", rr.Code)
 	}
 }
 
@@ -195,16 +195,16 @@ func TestHandle_MessengerSendText_StoresSentID(t *testing.T) {
 			return defaultOutput(), nil
 		},
 	}
-	messenger := &mockMessenger{
+	monthsenger := &mockMessenger{
 		sendTextFn: func(_ context.Context, _, _ string) (string, error) { return "SENT-ID-99", nil },
 	}
-	h := newHandler(analyzer, messenger)
+	h := newHandler(analyzer, monthsenger)
 	body := buildPayload("inst", "5511888888888@s.whatsapp.net", "MSG-4", false,
 		evolutionMessage{Conversation: "50 pix"}, "")
 	doRequest(h, body)
 
 	if _, ok := h.sentIDs.Load("SENT-ID-99"); !ok {
-		t.Error("sentID deveria ter sido armazenado")
+		t.Error("sentID should ter sido armazenado")
 	}
 }
 
@@ -214,15 +214,18 @@ func TestHandle_MessengerSendText_Error(t *testing.T) {
 			return defaultOutput(), nil
 		},
 	}
-	messenger := &mockMessenger{
+	monthsenger := &mockMessenger{
 		sendTextFn: func(_ context.Context, _, _ string) (string, error) {
 			return "", errors.New("whatsapp down")
 		},
 	}
 	body := buildPayload("inst", "5511888888888@s.whatsapp.net", "MSG-5", false,
 		evolutionMessage{Conversation: "50 pix"}, "")
-	rr := doRequest(newHandler(analyzer, messenger), body)
+	rr := doRequest(newHandler(analyzer, monthsenger), body)
 	if rr.Code != 201 {
-		t.Errorf("erro no messenger não deve afetar resposta HTTP, got %d", rr.Code)
+		t.Errorf("error in monthsenger not deve afetar resposta HTTP, got %d", rr.Code)
 	}
 }
+
+
+

@@ -36,8 +36,8 @@ type StatementTransaction struct {
 	Amount            float64
 	Category          string
 	PaymentMethod     string
-	Kind              string // "EXPENSE", "INCOME" ou "TRANSFER"
-	TransferDirection string // "IN" (resgate) ou "OUT" (aplicação), só para TRANSFER
+	Kind              string // "EXPENSE", "INCOME" or "TRANSFER"
+	TransferDirection string // "IN" (redeem) or "OUT" (apply), only for TRANSFER
 }
 
 type ExpenseAnalysis struct {
@@ -45,7 +45,7 @@ type ExpenseAnalysis struct {
 	Description       *string
 	Category          *string
 	PaymentMethod     *string
-	TransferDirection string // "IN", "OUT" ou "" para não-TRANSFER
+	TransferDirection string // "IN", "OUT" or "" for non-TRANSFER
 	Confidence        float64
 	RawResponse       string
 	Type              ExpenseType

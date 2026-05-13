@@ -1,4 +1,4 @@
-package usecase
+﻿package usecase
 
 import (
 	"context"
@@ -36,28 +36,28 @@ func TestExecuteText_Installment_Success(t *testing.T) {
 
 	out, err := uc.ExecuteText(context.Background(), TextInput{Text: "comprei iPhone 15 em 12x de 100"})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if out.Type != "INSTALLMENT" {
-		t.Errorf("type esperado INSTALLMENT, got %s", out.Type)
+		t.Errorf("type expected INSTALLMENT, got %s", out.Type)
 	}
 	if out.Amount != 1200.0 {
-		t.Errorf("amount esperado 1200.0, got %v", out.Amount)
+		t.Errorf("amount expected 1200.0, got %v", out.Amount)
 	}
 	if out.TotalInstallments != 12 {
-		t.Errorf("total_installments esperado 12, got %d", out.TotalInstallments)
+		t.Errorf("total_installments expected 12, got %d", out.TotalInstallments)
 	}
 	if out.InstallmentAmount != 100.0 {
-		t.Errorf("installment_amount esperado 100.0, got %v", out.InstallmentAmount)
+		t.Errorf("installment_amount expected 100.0, got %v", out.InstallmentAmount)
 	}
 	if savedPurchase == nil {
-		t.Fatal("purchase não foi salvo")
+		t.Fatal("purchase not foi salvo")
 	}
 	if savedPurchase.Type != domain.PurchaseTypeInstallment {
-		t.Errorf("type esperado INSTALLMENT, got %s", savedPurchase.Type)
+		t.Errorf("type expected INSTALLMENT, got %s", savedPurchase.Type)
 	}
 	if len(savedPayments) != 12 {
-		t.Errorf("esperava 12 pagamentos salvos, got %d", len(savedPayments))
+		t.Errorf("expected 12 pagamentos salvos, got %d", len(savedPayments))
 	}
 }
 
@@ -73,9 +73,9 @@ func TestExecuteText_Installment_AmountNil(t *testing.T) {
 		return analysis, nil
 	}})
 
-	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "comprei parcelado"})
+	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "comprei installmentdo"})
 	if err == nil {
-		t.Fatal("esperava erro por amount nil")
+		t.Fatal("expected error for amount nil")
 	}
 }
 
@@ -98,10 +98,10 @@ func TestExecuteText_Installment_NoInstallmentInfo_FallbackToSingle(t *testing.T
 
 	out, err := uc.ExecuteText(context.Background(), TextInput{Text: "comprei algo"})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if out.Type != "SINGLE" {
-		t.Errorf("type esperado SINGLE após fallback, got %s", out.Type)
+		t.Errorf("type expected SINGLE after fallback, got %s", out.Type)
 	}
 }
 
@@ -124,9 +124,9 @@ func TestExecuteText_Installment_RepoError(t *testing.T) {
 		return analysis, nil
 	}})
 
-	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "compra parcelada"})
+	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "compra installmentda"})
 	if err == nil {
-		t.Fatal("esperava erro do repo")
+		t.Fatal("expected error from repo")
 	}
 }
 
@@ -154,14 +154,14 @@ func TestExecuteText_Installment_InstallmentAmountCalculated_WhenZero(t *testing
 
 	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "compra em 3x"})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if savedPurchase.InstallmentAmount == nil || *savedPurchase.InstallmentAmount != 100.0 {
 		var got interface{}
 		if savedPurchase.InstallmentAmount != nil {
 			got = *savedPurchase.InstallmentAmount
 		}
-		t.Errorf("installment_amount calculado esperado 100.0, got %v", got)
+		t.Errorf("installment_amount calculado expected 100.0, got %v", got)
 	}
 }
 
@@ -189,17 +189,19 @@ func TestExecuteText_Installment_PaymentsHaveDueDates(t *testing.T) {
 
 	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "notebook 3x"})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	for i, p := range savedPayments {
 		if p.DueDate == nil {
 			t.Errorf("pagamento %d sem due_date", i+1)
 		}
 		if p.InstallmentNumber == nil || *p.InstallmentNumber != i+1 {
-			t.Errorf("parcela %d com installment_number errado", i+1)
+			t.Errorf("installment %d com installment_number errado", i+1)
 		}
 		if p.Status != domain.PaymentStatusPending {
-			t.Errorf("parcela %d esperava status PENDING, got %s", i+1, p.Status)
+			t.Errorf("installment %d expected status PENDING, got %s", i+1, p.Status)
 		}
 	}
 }
+
+

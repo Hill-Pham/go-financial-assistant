@@ -1,4 +1,4 @@
-package httpserver
+﻿package httpserver
 
 import (
 	"context"
@@ -20,7 +20,7 @@ func exportAnalyzer(month time.Time) *mockAnalyzer {
 
 func TestHandleExportCommand_SendsDocument(t *testing.T) {
 	documentSent := false
-	messenger := &mockMessenger{
+	monthsenger := &mockMessenger{
 		sendDocumentFn: func(_ context.Context, _, _, _, _ string) (string, error) {
 			documentSent = true
 			return "msg-id-123", nil
@@ -33,22 +33,22 @@ func TestHandleExportCommand_SendsDocument(t *testing.T) {
 	}
 
 	month := time.Date(2025, time.March, 1, 0, 0, 0, 0, time.UTC)
-	h := newHandler(exportAnalyzer(month), messenger, exporter)
+	h := newHandler(exportAnalyzer(month), monthsenger, exporter)
 	body := buildPayload("inst", "5511888888888@s.whatsapp.net", "MSG-EXP-1", false,
-		evolutionMessage{Conversation: "exportar março 2025"}, "")
+		evolutionMessage{Conversation: "export march 2025"}, "")
 	rr := doRequest(h, body)
 
 	if rr.Code != http.StatusOK {
-		t.Errorf("esperava 200, got %d", rr.Code)
+		t.Errorf("expected 200, got %d", rr.Code)
 	}
 	if !documentSent {
-		t.Error("SendDocument não foi chamado")
+		t.Error("SendDocument was not called")
 	}
 }
 
 func TestHandleExportCommand_EmptyMonth_SendsText(t *testing.T) {
 	textSent := ""
-	messenger := &mockMessenger{
+	monthsenger := &mockMessenger{
 		sendTextFn: func(_ context.Context, _, text string) (string, error) {
 			textSent = text
 			return "", nil
@@ -61,16 +61,16 @@ func TestHandleExportCommand_EmptyMonth_SendsText(t *testing.T) {
 	}
 
 	month := time.Date(2020, time.February, 1, 0, 0, 0, 0, time.UTC)
-	h := newHandler(exportAnalyzer(month), messenger, exporter)
+	h := newHandler(exportAnalyzer(month), monthsenger, exporter)
 	body := buildPayload("inst", "5511888888888@s.whatsapp.net", "MSG-EXP-2", false,
-		evolutionMessage{Conversation: "exportar fevereiro 2020"}, "")
+		evolutionMessage{Conversation: "export february 2020"}, "")
 	rr := doRequest(h, body)
 
 	if rr.Code != http.StatusOK {
-		t.Errorf("esperava 200, got %d", rr.Code)
+		t.Errorf("expected 200, got %d", rr.Code)
 	}
 	if textSent == "" {
-		t.Error("esperava mensagem de texto para mês vazio")
+		t.Error("expected text message for empty month")
 	}
 }
 
@@ -84,11 +84,11 @@ func TestHandleExportCommand_ExporterError_Returns500(t *testing.T) {
 	month := time.Date(2025, time.March, 1, 0, 0, 0, 0, time.UTC)
 	h := newHandler(exportAnalyzer(month), &mockMessenger{}, exporter)
 	body := buildPayload("inst", "5511888888888@s.whatsapp.net", "MSG-EXP-3", false,
-		evolutionMessage{Conversation: "exportar março"}, "")
+		evolutionMessage{Conversation: "export march"}, "")
 	rr := doRequest(h, body)
 
 	if rr.Code != http.StatusInternalServerError {
-		t.Errorf("esperava 500, got %d", rr.Code)
+		t.Errorf("expected 500, got %d", rr.Code)
 	}
 }
 
@@ -104,10 +104,14 @@ func TestHandleExportCommand_UsesMonthFromAnalyzer(t *testing.T) {
 	want := time.Date(2024, time.April, 1, 0, 0, 0, 0, time.UTC)
 	h := newHandler(exportAnalyzer(want), &mockMessenger{}, exporter)
 	body := buildPayload("inst", "5511888888888@s.whatsapp.net", "MSG-EXP-4", false,
-		evolutionMessage{Conversation: "exportar abril 2024"}, "")
+		evolutionMessage{Conversation: "export april 2024"}, "")
 	doRequest(h, body)
 
 	if !receivedMonth.Equal(want) {
-		t.Errorf("esperava mês %v, got %v", want, receivedMonth)
+		t.Errorf("expected month %v, got %v", want, receivedMonth)
 	}
 }
+
+
+
+

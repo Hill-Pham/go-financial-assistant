@@ -1,4 +1,4 @@
-package gemini
+﻿package gemini
 
 import (
 	"context"
@@ -262,7 +262,7 @@ func parseStatementResponse(resp *genai.GenerateContentResponse) (*ports.Stateme
 			if t.Direction == "IN" || t.Direction == "OUT" {
 				direction = t.Direction
 			} else if t.Amount > 0 {
-				// heuristic fallback: RESGATE has "RESGATE" in the description
+				// heuristic fallback: REDEEM has "REDEEM" in the description
 				if len(t.RawDescription) >= 6 && t.RawDescription[:6] == "RESGAT" {
 					direction = "IN"
 				} else {

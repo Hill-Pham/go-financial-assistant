@@ -1,4 +1,4 @@
-package usecase
+﻿package usecase
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 func (uc *AnalyzeExpense) ExecuteDocument(ctx context.Context, input DocumentInput) (*StatementOutput, error) {
 	analysis, err := uc.analyzer.AnalyzeDocument(ctx, input.Data, input.MimeType)
 	if err != nil {
-		return nil, fmt.Errorf("erro ao analisar extrato: %w", err)
+		return nil, fmt.Errorf("error analyzing statement: %w", err)
 	}
 
 	output := &StatementOutput{}
@@ -23,7 +23,7 @@ func (uc *AnalyzeExpense) ExecuteDocument(ctx context.Context, input DocumentInp
 
 		isDuplicate, err := uc.repo.ExistsPaymentByDateAndAmount(ctx, tx.Date, tx.Amount)
 		if err != nil {
-			uc.logger.Error("erro ao verificar duplicata", "description", tx.RawDescription, "error", err)
+			uc.logger.Error("error checking duplicate", "description", tx.RawDescription, "error", err)
 			continue
 		}
 
@@ -42,7 +42,7 @@ func (uc *AnalyzeExpense) ExecuteDocument(ctx context.Context, input DocumentInp
 		}
 
 		if err := uc.saveStatementTransaction(ctx, tx); err != nil {
-			uc.logger.Error("erro ao salvar transação do extrato", "description", tx.RawDescription, "kind", tx.Kind, "error", err)
+			uc.logger.Error("error saving statement transaction", "description", tx.RawDescription, "kind", tx.Kind, "error", err)
 			continue
 		}
 
@@ -89,7 +89,7 @@ func (uc *AnalyzeExpense) SavePendingTransaction(ctx context.Context, tx Pending
 		)
 	}
 	if err != nil {
-		return fmt.Errorf("transação inválida: %w", err)
+		return fmt.Errorf("transaĂ§Ă£o invĂ¡lida: %w", err)
 	}
 
 	pmt := domain.NewPayment(purchase.ID, tx.Amount, domain.PaymentStatusPaid)
@@ -141,7 +141,7 @@ func (uc *AnalyzeExpense) saveStatementTransaction(ctx context.Context, tx ports
 		)
 	}
 	if err != nil {
-		return fmt.Errorf("transação inválida: %w", err)
+		return fmt.Errorf("transaĂ§Ă£o invĂ¡lida: %w", err)
 	}
 
 	pmt := domain.NewPayment(purchase.ID, tx.Amount, domain.PaymentStatusPaid)

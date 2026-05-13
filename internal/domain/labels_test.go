@@ -1,4 +1,4 @@
-package domain
+﻿package domain
 
 import "testing"
 
@@ -7,12 +7,12 @@ func TestCategoryLabel(t *testing.T) {
 		category Category
 		expected string
 	}{
-		{CategoryFood, "Alimentação"},
-		{CategoryTransport, "Transporte"},
-		{CategoryHealth, "Saúde"},
-		{CategoryEntertainment, "Lazer"},
-		{CategoryShopping, "Compras"},
-		{CategoryMarket, "Mercado"},
+		{CategoryFood, "Food"},
+		{CategoryTransport, "Transport"},
+		{CategoryHealth, "SaĂºde"},
+		{CategoryEntertainment, "Entertainment"},
+		{CategoryShopping, "Shopping"},
+		{CategoryMarket, "Market"},
 		{CategoryOther, "Others"},
 		{Category("UNKNOWN"), "Others"},
 	}
@@ -43,3 +43,5 @@ func TestPaymentMethodLabel(t *testing.T) {
 		}
 	}
 }
+
+

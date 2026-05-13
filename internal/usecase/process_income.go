@@ -1,4 +1,4 @@
-package usecase
+﻿package usecase
 
 import (
 	"context"
@@ -16,7 +16,7 @@ func (uc *AnalyzeExpense) processIncome(
 	rawInput string,
 ) (*ExpenseOutput, error) {
 	if analysis.Amount == nil {
-		return nil, fmt.Errorf("não foi possível identificar o valor da entrada (confiança: %.0f%%)", analysis.Confidence*100)
+		return nil, fmt.Errorf("could not identify income amount (confidence: %.0f%%)", analysis.Confidence*100)
 	}
 
 	payment, err := parsePaymentMethod(paymentMethod)
@@ -33,13 +33,13 @@ func (uc *AnalyzeExpense) processIncome(
 		rawInput,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("entrada inválida: %w", err)
+		return nil, fmt.Errorf("invalid income entry: %w", err)
 	}
 
 	pmt := domain.NewPayment(income.ID, *analysis.Amount, domain.PaymentStatusPaid)
 
 	if err := uc.repo.Save(ctx, income, []domain.Payment{*pmt}); err != nil {
-		return nil, fmt.Errorf("erro ao salvar entrada: %w", err)
+		return nil, fmt.Errorf("error saving income entry: %w", err)
 	}
 
 	return &ExpenseOutput{
@@ -60,7 +60,7 @@ func (uc *AnalyzeExpense) processIncomeRecurring(
 	rawInput string,
 ) (*ExpenseOutput, error) {
 	if analysis.Amount == nil {
-		return nil, fmt.Errorf("valor não identificado para entrada recorrente")
+		return nil, fmt.Errorf("value not identified for recurring income")
 	}
 
 	payment, err := parsePaymentMethod(paymentMethod)
@@ -84,7 +84,7 @@ func (uc *AnalyzeExpense) processIncomeRecurring(
 		rawInput,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("entrada recorrente inválida: %w", err)
+		return nil, fmt.Errorf("invalid recurring income entry: %w", err)
 	}
 	income.DayOfMonth = &dayOfMonth
 
@@ -93,7 +93,7 @@ func (uc *AnalyzeExpense) processIncomeRecurring(
 	firstPayment.ReferenceMonth = &firstOfMonth
 
 	if err := uc.repo.Save(ctx, income, []domain.Payment{*firstPayment}); err != nil {
-		return nil, fmt.Errorf("erro ao salvar entrada recorrente: %w", err)
+		return nil, fmt.Errorf("error saving recurring income entry: %w", err)
 	}
 
 	return &ExpenseOutput{

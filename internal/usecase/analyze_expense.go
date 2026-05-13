@@ -1,4 +1,4 @@
-package usecase
+﻿package usecase
 
 import (
 	"context"
@@ -50,8 +50,8 @@ type PendingTransaction struct {
 	Category          string
 	Payment           string
 	RawInput          string
-	Kind              string // "EXPENSE", "INCOME" ou "TRANSFER"
-	TransferDirection string // "IN" ou "OUT", só para TRANSFER
+	Kind              string // "EXPENSE", "INCOME" or "TRANSFER"
+	TransferDirection string // "IN" ou "OUT", sĂ³ para TRANSFER
 }
 
 type StatementOutput struct {
@@ -219,3 +219,4 @@ func lastValidDay(year int, month time.Month, day int) int {
 	}
 	return day
 }
+

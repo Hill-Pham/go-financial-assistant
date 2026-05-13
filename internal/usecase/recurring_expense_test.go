@@ -1,4 +1,4 @@
-package usecase
+﻿package usecase
 
 import (
 	"context"
@@ -34,33 +34,33 @@ func TestExecuteText_Recurring_Success(t *testing.T) {
 		return analysis, nil
 	}})
 
-	out, err := uc.ExecuteText(context.Background(), TextInput{Text: "Netflix 55 reais todo mês dia 15"})
+	out, err := uc.ExecuteText(context.Background(), TextInput{Text: "Netflix 55 currency todo month dia 15"})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if out.Type != "RECURRING" {
-		t.Errorf("type esperado RECURRING, got %s", out.Type)
+		t.Errorf("type expected RECURRING, got %s", out.Type)
 	}
 	if out.Amount != 55.0 {
-		t.Errorf("amount esperado 55.0, got %v", out.Amount)
+		t.Errorf("amount expected 55.0, got %v", out.Amount)
 	}
 	if out.DayOfMonth != 15 {
-		t.Errorf("day_of_month esperado 15, got %d", out.DayOfMonth)
+		t.Errorf("day_of_month expected 15, got %d", out.DayOfMonth)
 	}
 	if savedPurchase == nil {
-		t.Fatal("purchase não foi salvo")
+		t.Fatal("purchase not foi salvo")
 	}
 	if savedPurchase.Description == nil || *savedPurchase.Description != "Netflix" {
-		t.Errorf("description esperada Netflix, got %v", savedPurchase.Description)
+		t.Errorf("description expected Netflix, got %v", savedPurchase.Description)
 	}
 	if savedPurchase.DayOfMonth == nil || *savedPurchase.DayOfMonth != 15 {
-		t.Errorf("day_of_month esperado 15 no purchase salvo")
+		t.Errorf("day_of_month expected 15 no purchase salvo")
 	}
 	if len(savedPayments) != 1 {
-		t.Fatalf("esperava 1 pagamento inicial, got %d", len(savedPayments))
+		t.Fatalf("expected 1 pagamento inicial, got %d", len(savedPayments))
 	}
 	if savedPayments[0].ReferenceMonth == nil {
-		t.Error("primeiro pagamento deveria ter reference_month preenchido")
+		t.Error("primeiro pagamento should ter reference_month preenchido")
 	}
 }
 
@@ -85,18 +85,18 @@ func TestExecuteText_Recurring_GeneratesFirstPayment(t *testing.T) {
 		return analysis, nil
 	}})
 
-	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "Netflix todo mês"})
+	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "Netflix todo month"})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if len(savedPayments) != 1 {
-		t.Fatalf("esperava 1 pagamento gerado, got %d", len(savedPayments))
+		t.Fatalf("expected 1 pagamento gerado, got %d", len(savedPayments))
 	}
 	if savedPayments[0].Status != domain.PaymentStatusPaid {
-		t.Errorf("primeiro pagamento deveria ter status PAID, got %s", savedPayments[0].Status)
+		t.Errorf("primeiro pagamento should ter status PAID, got %s", savedPayments[0].Status)
 	}
 	if savedPayments[0].ReferenceMonth == nil {
-		t.Error("primeiro pagamento deveria ter reference_month preenchido")
+		t.Error("primeiro pagamento should ter reference_month preenchido")
 	}
 }
 
@@ -111,9 +111,9 @@ func TestExecuteText_Recurring_AmountNil(t *testing.T) {
 		return analysis, nil
 	}})
 
-	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "academia todo mês"})
+	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "academia todo month"})
 	if err == nil {
-		t.Fatal("esperava erro por amount nil")
+		t.Fatal("expected error for amount nil")
 	}
 }
 
@@ -140,15 +140,15 @@ func TestExecuteText_Recurring_DefaultDayOfMonth(t *testing.T) {
 
 	expectedDay := time.Now().UTC().Day()
 
-	out, err := uc.ExecuteText(context.Background(), TextInput{Text: "academia 80 por mês"})
+	out, err := uc.ExecuteText(context.Background(), TextInput{Text: "academia 80 por month"})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if out.DayOfMonth != expectedDay {
-		t.Errorf("day_of_month padrão esperado %d (hoje), got %d", expectedDay, out.DayOfMonth)
+		t.Errorf("day_of_month default expected %d (hoje), got %d", expectedDay, out.DayOfMonth)
 	}
 	if savedPurchase.DayOfMonth == nil || *savedPurchase.DayOfMonth != expectedDay {
-		t.Errorf("purchase salvo deveria ter day_of_month = %d", expectedDay)
+		t.Errorf("purchase salvo should ter day_of_month = %d", expectedDay)
 	}
 }
 
@@ -168,7 +168,7 @@ func TestExecuteText_CancelRecurring_Success(t *testing.T) {
 		PaymentMethod: domain.PaymentMethodCreditCard,
 		Type:          domain.PurchaseTypeRecurring,
 		IsActive:      true,
-		RawInput:      "Netflix todo mês",
+		RawInput:      "Netflix todo month",
 	}
 
 	var updated *domain.Purchase
@@ -188,25 +188,25 @@ func TestExecuteText_CancelRecurring_Success(t *testing.T) {
 
 	out, err := uc.ExecuteText(context.Background(), TextInput{Text: "cancelei Netflix"})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if out.Type != "CANCEL_RECURRING" {
-		t.Errorf("type esperado CANCEL_RECURRING, got %s", out.Type)
+		t.Errorf("type expected CANCEL_RECURRING, got %s", out.Type)
 	}
 	if !out.Cancelled {
-		t.Error("cancelled deveria ser true")
+		t.Error("cancelled should be true")
 	}
 	if out.CancelledDescription != "Netflix" {
-		t.Errorf("cancelled_description esperado Netflix, got %s", out.CancelledDescription)
+		t.Errorf("cancelled_description expected Netflix, got %s", out.CancelledDescription)
 	}
 	if updated == nil {
-		t.Fatal("purchase não foi atualizado")
+		t.Fatal("purchase not foi currentizado")
 	}
 	if updated.IsActive {
-		t.Error("purchase deveria estar inativo após cancelamento")
+		t.Error("purchase should be inativo after cancelamento")
 	}
 	if updated.CancelledAt == nil {
-		t.Error("CancelledAt deveria estar preenchido")
+		t.Error("CancelledAt should be preenchido")
 	}
 }
 
@@ -228,7 +228,7 @@ func TestExecuteText_CancelRecurring_NotFound(t *testing.T) {
 
 	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "cancelei algo"})
 	if err == nil {
-		t.Fatal("esperava erro por não encontrar despesa recorrente")
+		t.Fatal("expected error for not encontrar recurring expense")
 	}
 }
 
@@ -244,7 +244,7 @@ func TestExecuteText_CancelRecurring_NoDescription(t *testing.T) {
 
 	_, err := uc.ExecuteText(context.Background(), TextInput{Text: "cancelei algo"})
 	if err == nil {
-		t.Fatal("esperava erro por falta de descrição")
+		t.Fatal("expected error for falta de descriĂ§Ă£o")
 	}
 }
 
@@ -264,7 +264,7 @@ func TestExecuteText_CancelRecurring_UsesDescriptionFieldAsFallback(t *testing.T
 		PaymentMethod: domain.PaymentMethodCreditCard,
 		Type:          domain.PurchaseTypeRecurring,
 		IsActive:      true,
-		RawInput:      "Spotify todo mês",
+		RawInput:      "Spotify todo month",
 	}
 
 	repo := &mockPurchaseRepo{
@@ -279,9 +279,11 @@ func TestExecuteText_CancelRecurring_UsesDescriptionFieldAsFallback(t *testing.T
 
 	out, err := uc.ExecuteText(context.Background(), TextInput{Text: "cancelei Spotify"})
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if out.CancelledDescription != "Spotify" {
-		t.Errorf("esperava descrição Spotify, got %s", out.CancelledDescription)
+		t.Errorf("expected descriĂ§Ă£o Spotify, got %s", out.CancelledDescription)
 	}
 }
+
+

@@ -20,8 +20,8 @@ type PaymentDetail struct {
 	Amount            float64
 	Status            string
 	PurchaseType      string
-	PurchaseKind      string // "EXPENSE", "INCOME" ou "TRANSFER"
-	TransferDirection string // "IN", "OUT" ou "" para não-TRANSFER
+	PurchaseKind      string // "EXPENSE", "INCOME" or "TRANSFER"
+	TransferDirection string // "IN", "OUT" or "" for non-TRANSFER
 	InstallmentNumber *int
 	DueDate           *time.Time
 	ReferenceMonth    *time.Time

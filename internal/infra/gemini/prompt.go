@@ -46,7 +46,7 @@ Category rules:
 - OTHER: insurance, bank slips, credit card bills, transfers to people, others
 
 Payment method rules:
-- DEBIT_CARD: description starts with "Mã QR"
+- DEBIT_CARD: description starts with "Ma QR"
 - CREDIT_CARD: "Credit card" (credit card bill payment)
 - OTHER: "INSURANCE", "Invoice", others
 

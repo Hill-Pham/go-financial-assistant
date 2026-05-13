@@ -31,11 +31,11 @@ func (r *MonthlyReport) Send(ctx context.Context) error {
 
 	data, filename, summary, err := r.exporter.Execute(ctx, prevMonth)
 	if err != nil {
-		return fmt.Errorf("erro ao gerar relatório mensal: %w", err)
+		return fmt.Errorf("error generating monthly report: %w", err)
 	}
 
 	if data == nil {
-		r.logger.Info("sem lançamentos no mês anterior, relatório não enviado",
+		r.logger.Info("no entries in previous month, monthly report not sent",
 			"month", prevMonth.Format("01/2006"))
 		return nil
 	}
@@ -44,10 +44,10 @@ func (r *MonthlyReport) Send(ctx context.Context) error {
 	base64Data := base64.StdEncoding.EncodeToString(data)
 
 	if _, err := r.messenger.SendDocument(ctx, r.phone, filename, base64Data, caption); err != nil {
-		return fmt.Errorf("erro ao enviar relatório mensal: %w", err)
+		return fmt.Errorf("error sending monthly report: %w", err)
 	}
 
-	r.logger.Info("relatório mensal enviado", "month", prevMonth.Format("01/2006"))
+	r.logger.Info("monthly report sent", "month", prevMonth.Format("01/2006"))
 	return nil
 }
 

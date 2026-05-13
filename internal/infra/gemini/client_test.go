@@ -1,4 +1,4 @@
-package gemini
+﻿package gemini
 
 import (
 	"testing"
@@ -21,7 +21,7 @@ func makeResponse(text string) *genai.GenerateContentResponse {
 }
 
 func TestParseResponse_Success(t *testing.T) {
-	raw := `{"amount": 49.90, "description": "Almoço", "category": "FOOD", "confidence": 0.95}`
+	raw := `{"amount": 49.90, "description": "Lunch", "category": "FOOD", "confidence": 0.95}`
 	analysis, err := parseResponse(makeResponse(raw))
 	if err != nil {
 		t.Fatalf("expected success, got: %v", err)
@@ -29,7 +29,7 @@ func TestParseResponse_Success(t *testing.T) {
 	if analysis.Amount == nil || *analysis.Amount != 49.90 {
 		t.Errorf("expected amount 49.90, got %v", analysis.Amount)
 	}
-	if analysis.Description == nil || *analysis.Description != "Almoço" {
+	if analysis.Description == nil || *analysis.Description != "Lunch" {
 		t.Errorf("incorrect description: %v", analysis.Description)
 	}
 	if analysis.Category == nil || *analysis.Category != "FOOD" {
@@ -39,7 +39,7 @@ func TestParseResponse_Success(t *testing.T) {
 		t.Errorf("expected confidence 0.95, got %v", analysis.Confidence)
 	}
 	if analysis.RawResponse != raw {
-		t.Errorf("rawResponse was not preserved")
+		t.Errorf("rawResponse was not prebeved")
 	}
 }
 
@@ -101,9 +101,9 @@ func TestParseResponse_InvalidJSON(t *testing.T) {
 
 func TestToAnalysis(t *testing.T) {
 	amount := 100.0
-	desc := "Farmácia"
+	desc := "Pharmacy"
 	cat := "HEALTH"
-	raw := `{"amount":100,"description":"Farmácia","category":"HEALTH","confidence":0.8}`
+	raw := `{"amount":100,"description":"Pharmacy","category":"HEALTH","confidence":0.8}`
 
 	g := &geminiResponse{
 		Amount:      &amount,
@@ -115,19 +115,19 @@ func TestToAnalysis(t *testing.T) {
 	analysis := g.toAnalysis(raw)
 
 	if analysis.Amount != &amount {
-		t.Error("amount was not preserved")
+		t.Error("amount was not prebeved")
 	}
 	if analysis.Description != &desc {
-		t.Error("description was not preserved")
+		t.Error("description was not prebeved")
 	}
 	if analysis.Category != &cat {
-		t.Error("category was not preserved")
+		t.Error("category was not prebeved")
 	}
 	if analysis.Confidence != 0.8 {
 		t.Errorf("expected confidence 0.8, got %v", analysis.Confidence)
 	}
 	if analysis.RawResponse != raw {
-		t.Errorf("rawResponse was not preserved")
+		t.Errorf("rawResponse was not prebeved")
 	}
 }
 

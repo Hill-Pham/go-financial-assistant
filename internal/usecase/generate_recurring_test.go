@@ -1,4 +1,4 @@
-package usecase
+﻿package usecase
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func recurringPurchase(dayOfMonth int) domain.Purchase {
 		Type:          domain.PurchaseTypeRecurring,
 		IsActive:      true,
 		DayOfMonth:    &day,
-		RawInput:      "Netflix todo mês",
+		RawInput:      "Netflix todo month",
 	}
 }
 
@@ -46,10 +46,10 @@ func TestGenerateRecurringExpenses_SkipsWhenNotTargetDay(t *testing.T) {
 
 	uc := NewAnalyzeExpense(repo, &mockAnalyzer{}, slog.Default())
 	if err := uc.GenerateRecurringExpenses(context.Background()); err != nil {
-		t.Fatalf("erro inesperado: %v", err)
+		t.Fatalf("erro inexpected: %v", err)
 	}
 	if paymentSaved {
-		t.Error("não deveria gerar pagamento fora do dia configurado")
+		t.Error("not should gerar pagamento fora do dia configurado")
 	}
 }
 
@@ -72,10 +72,10 @@ func TestGenerateRecurringExpenses_GeneratesOnTargetDay(t *testing.T) {
 
 	uc := NewAnalyzeExpense(repo, &mockAnalyzer{}, slog.Default())
 	if err := uc.GenerateRecurringExpenses(context.Background()); err != nil {
-		t.Fatalf("erro inesperado: %v", err)
+		t.Fatalf("erro inexpected: %v", err)
 	}
 	if !paymentSaved {
-		t.Error("deveria ter gerado o pagamento no dia configurado")
+		t.Error("should ter gerado o pagamento no dia configurado")
 	}
 }
 
@@ -98,37 +98,39 @@ func TestGenerateRecurringExpenses_SkipsAlreadyPaidMonth(t *testing.T) {
 
 	uc := NewAnalyzeExpense(repo, &mockAnalyzer{}, slog.Default())
 	if err := uc.GenerateRecurringExpenses(context.Background()); err != nil {
-		t.Fatalf("erro inesperado: %v", err)
+		t.Fatalf("erro inexpected: %v", err)
 	}
 	if paymentSaved {
-		t.Error("não deveria gerar pagamento duplicado no mesmo mês")
+		t.Error("not should gerar pagamento duplicado no monthmo month")
 	}
 }
 
 func TestLastValidDay_NormalDay(t *testing.T) {
 	got := lastValidDay(2025, time.March, 15)
 	if got != 15 {
-		t.Errorf("esperava 15, got %d", got)
+		t.Errorf("expected 15, got %d", got)
 	}
 }
 
 func TestLastValidDay_DayExceedsMonth(t *testing.T) {
 	got := lastValidDay(2025, time.February, 31)
 	if got != 28 {
-		t.Errorf("esperava 28 (último dia de fev/2025), got %d", got)
+		t.Errorf("expected 28 (Ăºltimo dia de fev/2025), got %d", got)
 	}
 }
 
 func TestLastValidDay_LeapYear(t *testing.T) {
 	got := lastValidDay(2024, time.February, 30)
 	if got != 29 {
-		t.Errorf("esperava 29 (último dia de fev/2024 bissexto), got %d", got)
+		t.Errorf("expected 29 (Ăºltimo dia de fev/2024 leap-year), got %d", got)
 	}
 }
 
 func TestLastValidDay_Day31InMonth30(t *testing.T) {
 	got := lastValidDay(2025, time.April, 31)
 	if got != 30 {
-		t.Errorf("esperava 30 (último dia de abril), got %d", got)
+		t.Errorf("expected 30 (Ăºltimo dia de april), got %d", got)
 	}
 }
+
+

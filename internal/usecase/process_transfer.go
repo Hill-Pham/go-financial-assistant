@@ -16,7 +16,7 @@ func (uc *AnalyzeExpense) processTransfer(
 ) (*ExpenseOutput, error) {
 	if analysis.Amount == nil {
 		return nil, fmt.Errorf(
-			"não foi possível identificar o valor da transferência (confiança: %.0f%%)",
+			"could not identify transfer amount (confidence: %.0f%%)",
 			analysis.Confidence*100,
 		)
 	}
@@ -35,13 +35,13 @@ func (uc *AnalyzeExpense) processTransfer(
 		domain.ParseTransferDirection(analysis.TransferDirection),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("transferência inválida: %w", err)
+		return nil, fmt.Errorf("invalid transfer: %w", err)
 	}
 
 	pmt := domain.NewPayment(transfer.ID, *analysis.Amount, domain.PaymentStatusPaid)
 
 	if err := uc.repo.Save(ctx, transfer, []domain.Payment{*pmt}); err != nil {
-		return nil, fmt.Errorf("erro ao salvar transferência: %w", err)
+		return nil, fmt.Errorf("error saving transfer: %w", err)
 	}
 
 	return &ExpenseOutput{
@@ -53,4 +53,3 @@ func (uc *AnalyzeExpense) processTransfer(
 		Type:        string(ports.ExpenseTypeTransfer),
 	}, nil
 }
-

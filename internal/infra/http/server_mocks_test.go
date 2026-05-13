@@ -1,4 +1,4 @@
-package httpserver
+﻿package httpserver
 
 import (
 	"bytes"
@@ -44,7 +44,7 @@ func (m *mockAnalyzer) SavePendingTransaction(ctx context.Context, tx usecase.Pe
 type mockMessenger struct {
 	sendTextFn         func(ctx context.Context, to, text string) (string, error)
 	sendDocumentFn     func(ctx context.Context, to, filename, base64Data, caption string) (string, error)
-	fetchImageBase64Fn func(ctx context.Context, remoteJid string, fromMe bool, messageID string) (string, error)
+	fetchImageBase64Fn func(ctx context.Context, remoteJid string, fromMe bool, monthsageID string) (string, error)
 }
 
 func (m *mockMessenger) SendText(ctx context.Context, to, text string) (string, error) {
@@ -61,9 +61,9 @@ func (m *mockMessenger) SendDocument(ctx context.Context, to, filename, base64Da
 	return "", nil
 }
 
-func (m *mockMessenger) FetchImageBase64(ctx context.Context, remoteJid string, fromMe bool, messageID string) (string, error) {
+func (m *mockMessenger) FetchImageBase64(ctx context.Context, remoteJid string, fromMe bool, monthsageID string) (string, error) {
 	if m.fetchImageBase64Fn != nil {
-		return m.fetchImageBase64Fn(ctx, remoteJid, fromMe, messageID)
+		return m.fetchImageBase64Fn(ctx, remoteJid, fromMe, monthsageID)
 	}
 	return "", nil
 }
@@ -83,12 +83,12 @@ var silentLogger = slog.New(slog.NewTextHandler(io.Discard, nil))
 
 func defaultOutput() *usecase.ExpenseOutput {
 	return &usecase.ExpenseOutput{
-		ID: "uuid-1", Amount: 50.0, Description: "Almoço",
+		ID: "uuid-1", Amount: 50.0, Description: "AlmoĂ§o",
 		Category: "FOOD", Payment: "PIX", Confidence: 0.95,
 	}
 }
 
-func newHandler(analyzer usecase.ExpenseAnalyzer, messenger *mockMessenger, exporters ...usecase.CSVExporter) *webhookHandler {
+func newHandler(analyzer usecase.ExpenseAnalyzer, monthsenger *mockMessenger, exporters ...usecase.CSVExporter) *webhookHandler {
 	var exporter usecase.CSVExporter = &mockCSVExporter{}
 	if len(exporters) > 0 && exporters[0] != nil {
 		exporter = exporters[0]
@@ -100,7 +100,7 @@ func newHandler(analyzer usecase.ExpenseAnalyzer, messenger *mockMessenger, expo
 		},
 		analyzer,
 		exporter,
-		messenger,
+		monthsenger,
 		silentLogger,
 	)
 }
@@ -124,3 +124,6 @@ func doRequest(h *webhookHandler, body []byte) *httptest.ResponseRecorder {
 	h.Handle(rr, req)
 	return rr
 }
+
+
+

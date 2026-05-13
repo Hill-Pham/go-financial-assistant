@@ -1,4 +1,4 @@
-package domain
+﻿package domain
 
 import (
 	"testing"
@@ -6,71 +6,71 @@ import (
 
 func TestNewPurchase_Valid(t *testing.T) {
 	desc := "Supermercado"
-	p, err := NewPurchase(150.0, &desc, CategoryFood, PaymentMethodPix, PurchaseTypeSingle, "compra no pix")
+	p, err := NewPurchase(150.0, &desc, CategoryFood, PaymentMethodPix, PurchaseTypeSingle, "purchase via pix")
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if p.TotalAmount != 150.0 {
-		t.Errorf("amount esperado 150.0, got %v", p.TotalAmount)
+		t.Errorf("expected amount 150.0, got %v", p.TotalAmount)
 	}
 	if p.Description == nil || *p.Description != "Supermercado" {
-		t.Errorf("description esperada 'Supermercado', got %v", p.Description)
+		t.Errorf("expected description 'Supermercado', got %v", p.Description)
 	}
 	if !p.IsActive {
-		t.Error("purchase novo deveria estar ativo")
+		t.Error("new purchase should be active")
 	}
 	if p.ID.String() == "" {
-		t.Error("ID não deveria ser vazio")
+		t.Error("ID should not be empty")
 	}
 }
 
 func TestNewPurchase_NilDescription(t *testing.T) {
 	p, err := NewPurchase(50.0, nil, CategoryOther, PaymentMethodCash, PurchaseTypeSingle, "raw")
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if p.Description != nil {
-		t.Errorf("description deveria ser nil, got %v", p.Description)
+		t.Errorf("description should be nil, got %v", p.Description)
 	}
 }
 
 func TestNewPurchase_InvalidAmount(t *testing.T) {
 	_, err := NewPurchase(0, nil, CategoryOther, PaymentMethodCash, PurchaseTypeSingle, "raw")
 	if err == nil {
-		t.Fatal("esperava erro para amount zero")
+		t.Fatal("expected error for amount zero")
 	}
 	if err != ErrInvalidAmount {
-		t.Errorf("esperava ErrInvalidAmount, got: %v", err)
+		t.Errorf("expected ErrInvalidAmount, got: %v", err)
 	}
 
 	_, err = NewPurchase(-10, nil, CategoryOther, PaymentMethodCash, PurchaseTypeSingle, "raw")
 	if err == nil {
-		t.Fatal("esperava erro para amount negativo")
+		t.Fatal("expected error for negative amount")
 	}
 }
 
 func TestPurchase_Cancel(t *testing.T) {
 	p, _ := NewPurchase(100.0, nil, CategoryOther, PaymentMethodPix, PurchaseTypeSingle, "raw")
 
-	p.Cancel("teste de cancelamento")
+	p.Cancel("cancellation test")
 
 	if p.IsActive {
-		t.Error("purchase deveria estar inativo após cancelamento")
+		t.Error("purchase should be inactive after cancellation")
 	}
 	if p.CancelledAt == nil {
-		t.Error("CancelledAt deveria estar preenchido")
+		t.Error("CancelledAt should be set")
 	}
-	if p.CancellationReason == nil || *p.CancellationReason != "teste de cancelamento" {
-		t.Errorf("CancellationReason esperado 'teste de cancelamento', got %v", p.CancellationReason)
+	if p.CancellationReason == nil || *p.CancellationReason != "cancellation test" {
+		t.Errorf("expected CancellationReason 'cancellation test', got %v", p.CancellationReason)
 	}
 }
 
 func TestNewPurchase_Recurring_Types(t *testing.T) {
 	p, err := NewPurchase(80.0, nil, CategoryHealth, PaymentMethodCreditCard, PurchaseTypeRecurring, "raw")
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if p.Type != PurchaseTypeRecurring {
-		t.Errorf("type esperado RECURRING, got %s", p.Type)
+		t.Errorf("type expected RECURRING, got %s", p.Type)
 	}
 }

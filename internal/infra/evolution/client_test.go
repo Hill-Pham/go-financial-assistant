@@ -1,4 +1,4 @@
-package evolution
+﻿package evolution
 
 import (
 	"context"
@@ -8,12 +8,12 @@ import (
 	"testing"
 )
 
-func newTestClient(server *httptest.Server) *Client {
+func newTestClient(bever *httptest.Server) *Client {
 	return &Client{
-		baseURL:    server.URL,
+		baseURL:    bever.URL,
 		instance:   "test-instance",
 		apiKey:     "test-key",
-		httpClient: server.Client(),
+		httpClient: bever.Client(),
 	}
 }
 
@@ -27,10 +27,10 @@ func TestSendText_Success(t *testing.T) {
 
 	id, err := newTestClient(srv).SendText(context.Background(), "5511999@s.whatsapp.net", "oi")
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if id != "MSG-123" {
-		t.Errorf("id esperado 'MSG-123', got '%s'", id)
+		t.Errorf("id expected 'MSG-123', got '%s'", id)
 	}
 }
 
@@ -45,7 +45,7 @@ func TestSendText_StripAtSign(t *testing.T) {
 	newTestClient(srv).SendText(context.Background(), "5511999@s.whatsapp.net", "texto")
 
 	if capturedBody["number"] != "5511999" {
-		t.Errorf("esperava número sem @, got '%s'", capturedBody["number"])
+		t.Errorf("expected number sem @, got '%s'", capturedBody["number"])
 	}
 }
 
@@ -57,19 +57,19 @@ func TestSendText_HTTPError(t *testing.T) {
 
 	_, err := newTestClient(srv).SendText(context.Background(), "5511999", "oi")
 	if err == nil {
-		t.Fatal("esperava erro para status 4xx")
+		t.Fatal("expected error for status 4xx")
 	}
 }
 
 func TestSendText_InvalidJSONResponse(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("não é json"))
+		w.Write([]byte("not is json"))
 	}))
 	defer srv.Close()
 
 	_, err := newTestClient(srv).SendText(context.Background(), "5511999", "oi")
 	if err == nil {
-		t.Fatal("esperava erro para JSON inválido na resposta")
+		t.Fatal("expected error for JSON invalid na resposta")
 	}
 }
 
@@ -85,10 +85,10 @@ func TestSendText_HeadersAndEndpoint(t *testing.T) {
 	newTestClient(srv).SendText(context.Background(), "5511999", "oi")
 
 	if capturedAPIKey != "test-key" {
-		t.Errorf("apikey esperada 'test-key', got '%s'", capturedAPIKey)
+		t.Errorf("apikey expected 'test-key', got '%s'", capturedAPIKey)
 	}
-	if capturedPath != "/message/sendText/test-instance" {
-		t.Errorf("path incorreto: %s", capturedPath)
+	if capturedPath != "/monthsage/sendText/test-instance" {
+		t.Errorf("path incorrect: %s", capturedPath)
 	}
 }
 
@@ -100,10 +100,10 @@ func TestFetchImageBase64_Success(t *testing.T) {
 
 	result, err := newTestClient(srv).FetchImageBase64(context.Background(), "jid", true, "MSG-1")
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if result != "abc123==" {
-		t.Errorf("base64 esperado 'abc123==', got '%s'", result)
+		t.Errorf("base64 expected 'abc123==', got '%s'", result)
 	}
 }
 
@@ -115,19 +115,19 @@ func TestFetchImageBase64_HTTPError(t *testing.T) {
 
 	_, err := newTestClient(srv).FetchImageBase64(context.Background(), "jid", false, "MSG-2")
 	if err == nil {
-		t.Fatal("esperava erro para status 4xx")
+		t.Fatal("expected error for status 4xx")
 	}
 }
 
 func TestFetchImageBase64_InvalidJSON(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("não é json"))
+		w.Write([]byte("not is json"))
 	}))
 	defer srv.Close()
 
 	_, err := newTestClient(srv).FetchImageBase64(context.Background(), "jid", false, "MSG-3")
 	if err == nil {
-		t.Fatal("esperava erro para JSON inválido")
+		t.Fatal("expected error for JSON invalid")
 	}
 }
 
@@ -141,10 +141,10 @@ func TestFetchConnectionState_Open(t *testing.T) {
 
 	state, err := newTestClient(srv).FetchConnectionState(context.Background())
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if state != "open" {
-		t.Errorf("esperava state 'open', got '%s'", state)
+		t.Errorf("expected state 'open', got '%s'", state)
 	}
 }
 
@@ -158,10 +158,10 @@ func TestFetchConnectionState_Close(t *testing.T) {
 
 	state, err := newTestClient(srv).FetchConnectionState(context.Background())
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if state != "close" {
-		t.Errorf("esperava state 'close', got '%s'", state)
+		t.Errorf("expected state 'close', got '%s'", state)
 	}
 }
 
@@ -173,7 +173,7 @@ func TestFetchConnectionState_HTTPError(t *testing.T) {
 
 	_, err := newTestClient(srv).FetchConnectionState(context.Background())
 	if err == nil {
-		t.Fatal("esperava erro para status 4xx")
+		t.Fatal("expected error for status 4xx")
 	}
 }
 
@@ -185,10 +185,10 @@ func TestEnsureInstance_Created(t *testing.T) {
 
 	created, err := newTestClient(srv).EnsureInstance(context.Background(), "5511999999999")
 	if err != nil {
-		t.Fatalf("esperava sucesso, got: %v", err)
+		t.Fatalf("expected success, got: %v", err)
 	}
 	if !created {
-		t.Error("esperava created=true para status 201")
+		t.Error("expected created=true for status 201")
 	}
 }
 
@@ -200,10 +200,10 @@ func TestEnsureInstance_AlreadyExists(t *testing.T) {
 
 	created, err := newTestClient(srv).EnsureInstance(context.Background(), "5511999999999")
 	if err != nil {
-		t.Fatalf("esperava sucesso para instância já existente, got: %v", err)
+		t.Fatalf("expected success for existing instance, got: %v", err)
 	}
 	if created {
-		t.Error("esperava created=false para status 403")
+		t.Error("expected created=false for status 403")
 	}
 }
 
@@ -215,7 +215,7 @@ func TestEnsureInstance_UnexpectedStatus(t *testing.T) {
 
 	_, err := newTestClient(srv).EnsureInstance(context.Background(), "5511999999999")
 	if err == nil {
-		t.Fatal("esperava erro para status 500")
+		t.Fatal("expected error for status 500")
 	}
 }
 
@@ -231,9 +231,11 @@ func TestFetchImageBase64_HeadersAndEndpoint(t *testing.T) {
 	newTestClient(srv).FetchImageBase64(context.Background(), "jid", false, "MSG-4")
 
 	if capturedAPIKey != "test-key" {
-		t.Errorf("apikey esperada 'test-key', got '%s'", capturedAPIKey)
+		t.Errorf("apikey expected 'test-key', got '%s'", capturedAPIKey)
 	}
 	if capturedPath != "/chat/getBase64FromMediaMessage/test-instance" {
-		t.Errorf("path incorreto: %s", capturedPath)
+		t.Errorf("path incorrect: %s", capturedPath)
 	}
 }
+
+

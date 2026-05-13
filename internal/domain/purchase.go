@@ -25,8 +25,8 @@ const (
 type TransferDirection string
 
 const (
-	TransferDirectionOut TransferDirection = "OUT" // aplicação: dinheiro saindo para investimento
-	TransferDirectionIn  TransferDirection = "IN"  // resgate: dinheiro voltando do investimento
+	TransferDirectionOut TransferDirection = "OUT" // apply: money leaving for investment
+	TransferDirectionIn  TransferDirection = "IN"  // redeem: money returning from investment
 )
 
 type PaymentMethod string
