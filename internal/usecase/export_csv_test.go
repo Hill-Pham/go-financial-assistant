@@ -308,7 +308,7 @@ func TestBuildExportCaption_WithTransfers(t *testing.T) {
 	if !strings.Contains(caption, "Expenses: R$ 1000.00") {
 		t.Errorf("caption sem expenses: %q", caption)
 	}
-	if !strings.Contains(caption, "Entradas: R$ 6000.00") {
+	if !strings.Contains(caption, "Income: R$ 6000.00") {
 		t.Errorf("caption sem entries: %q", caption)
 	}
 	if !strings.Contains(caption, "Resultado: R$ 5000.00") {
@@ -373,6 +373,3 @@ func parseCSV(t *testing.T, data []byte) [][]string {
 	}
 	return records
 }
-
-
-

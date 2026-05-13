@@ -48,7 +48,7 @@ Managing personal finances manually is tedious and error-prone. The owner wants 
 | Record an instalment purchase | "I bought sneakers for 300 USD in 3 installments on credit." |
 | Record a recurring expense | "Netflix is ​​55 USD every month, due on the 15th." |
 | Cancel a recurring expense | "cancel Netflix" |
-| Record an income | "I received 6000 reais in salary." |
+| Record an income | "I received BRL 6000 in salary." |
 | Record a recurring income | "salary 6000 every month" |
 | Record a transfer out (investment) | "I put 2000 in the piggy bank." |
 | Record a transfer in (redemption) | "I retrieved 500 from the piggy bank." |

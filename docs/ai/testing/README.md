@@ -86,7 +86,7 @@ description: Define testing approach, test cases, and quality assurance
 - [ ] `ExecuteDocument` — auto-saved transactions, duplicate → pending, Gemini error — **no test file**
 - [ ] `SavePendingTransaction` — EXPENSE / INCOME / TRANSFER kinds — **no test file**
 - [ ] `saveStatementTransaction` — each kind — **no test file**
-- [ ] `tryHandlePendingConfirmation` — sim confirmation, não skip, session expiry, non-confirmation text passes through — **no HTTP test**
+- [ ] `tryHandlePendingConfirmation` — yes confirmation, no skip, session expiry, non-confirmation text passes through — **no HTTP test**
 - [ ] `handleDocumentImport` — base64 present, base64 fetch, decode error — **no HTTP test**
 
 ---

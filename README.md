@@ -1,250 +1,250 @@
 # Go Financial Assistant
 
-Assistente financeiro pessoal via WhatsApp. Envie mensagens de texto, fotos de recibos ou extratos bancários em PDF para registrar despesas, entradas e transferências automaticamente. O assistente utiliza IA (Google Gemini) para interpretar as transações e armazená-las em um banco de dados PostgreSQL.
+Personal finance assistant via WhatsApp. Send text messages, receipt photos, or bank statement PDFs to automatically record expenses, income, and transfers. The assistant uses AI (Google Gemini) to interpret transactions and store them in a PostgreSQL database.
 
-## Como funciona
+## How It Works
 
-Você envia uma mensagem para **si mesmo** no WhatsApp — texto descrevendo um gasto, uma foto de recibo ou o PDF do extrato bancário — e o assistente registra as transações automaticamente.
+You send a message to **yourself** on WhatsApp - a text describing a purchase, a receipt photo, or a bank statement PDF - and the assistant records the transactions automatically.
 
-**Exemplos de mensagens:**
-- `"gastei 45 reais no almoço no pix"`
-- `"netflix 55 reais todo mês todo dia 15"`
-- `"cancelar netflix"`
-- `"recebi 6000 reais de salário"`
-- `"coloquei 2000 no cofrinho"`
-- `"quanto gastei em março?"`
-- `"exportar meus gastos de março"`
-- Foto de um recibo ou nota fiscal
-- PDF do extrato bancário (Itaú e outros)
+**Message examples:**
+- `"spent BRL 45 on lunch via PIX"`
+- `"netflix BRL 55 every month on day 15"`
+- `"cancel netflix"`
+- `"received BRL 6000 as salary"`
+- `"put BRL 2000 in the piggy bank"`
+- `"how much did I spend in March?"`
+- `"export my March expenses"`
+- Receipt or invoice photo
+- Bank statement PDF (Itau and others)
 
-O assistente classifica cada transação em três categorias:
+The assistant classifies each transaction into three categories:
 
-| Tipo | Descrição | Exemplo |
-|------|-----------|---------|
-| **Despesa** | Gasto real de dinheiro | Almoço, Netflix, conta de luz |
-| **Entrada** | Dinheiro recebido | Salário, freelance, reembolso |
-| **Transferência** | Movimentação entre contas próprias | Aplicação no cofrinho, resgate de CDB |
+| Type | Description | Example |
+|------|-------------|---------|
+| **Expense** | Real money spent | Lunch, Netflix, electricity bill |
+| **Income** | Money received | Salary, freelance, reimbursement |
+| **Transfer** | Movement between your own accounts | Savings deposit, CDB redemption |
 
-Transferências são excluídas dos totais de despesas e entradas — evitando que aplicações no cofrinho distorçam o resumo financeiro.
+Transfers are excluded from expense and income totals, so savings deposits do not distort your financial summary.
 
-## Tecnologias
+## Technologies
 
-- **Go** — aplicação principal
-- **Google Gemini** — análise e interpretação das mensagens
-- **Evolution API** — integração com WhatsApp
-- **PostgreSQL** — armazenamento das despesas
-- **Redis** — cache da Evolution API
-- **Docker / Docker Compose** — infraestrutura
+- **Go** - main application
+- **Google Gemini** - message analysis and interpretation
+- **Evolution API** - WhatsApp integration
+- **PostgreSQL** - expense storage
+- **Redis** - Evolution API cache
+- **Docker / Docker Compose** - infrastructure
 
-## Pré-requisitos
+## Prerequisites
 
-- [Docker](https://www.docker.com/) com Docker Compose
-- Chave de API do [Google Gemini](https://aistudio.google.com/app/apikey)
-- Conta no WhatsApp
+- [Docker](https://www.docker.com/) with Docker Compose
+- [Google Gemini](https://aistudio.google.com/app/apikey) API key
+- WhatsApp account
 
-## Configuração
+## Setup
 
-### 1. Clone o repositório
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/MarcosAAlbanoJunior/go-financial-assistant.git
 cd go-financial-assistant
 ```
 
-### 2. Configure as variáveis de ambiente
+### 2. Configure environment variables
 
-Copie o arquivo de exemplo e preencha com suas informações:
+Copy the example file and fill it in with your own values:
 
 ```bash
 cp .env.example .env
 ```
 
-Edite o `.env`:
+Edit `.env`:
 
 ```env
 PORT=3000
 DATABASE_URL=postgres://finassist:finassist@localhost:5432/finassist?sslmode=disable
-GEMINI_API_KEY=sua-chave-do-gemini
+GEMINI_API_KEY=your-gemini-key
 
-EVOLUTION_API_KEY=uma-chave-qualquer-para-proteger-a-api
+EVOLUTION_API_KEY=any-key-to-protect-the-api
 EVOLUTION_API_URL=http://localhost:8082
 EVOLUTION_INSTANCE=Financial Assistant
 OWNER_PHONE=5511999999999
 
-# Opcional — adicione aqui se o Evolution API usar um numero diferente do seu número (bug conhecido)
+# Optional - add this if Evolution API returns your number in a different format (known bug)
 ALLOWED_NUMBERS=
 
-# Senha para o endpoint /admin/qrcode (obrigatório para usar o endpoint em produção)
-ADMIN_SECRET=sua-senha-segura
+# Password for the /admin/qrcode endpoint (required for production use)
+ADMIN_SECRET=your-secure-password
 ```
 
-| Variável | Descrição |
+| Variable | Description |
 | --- | --- |
-| `GEMINI_API_KEY` | Chave da API do Google Gemini — obtenha em [aistudio.google.com](https://aistudio.google.com/app/apikey) |
-| `EVOLUTION_API_KEY` | Chave para proteger a sua instância da Evolution API — pode ser qualquer valor |
-| `EVOLUTION_INSTANCE` | Nome da instância no Evolution API |
-| `OWNER_PHONE` | Seu número de WhatsApp com código do país e DDD, sem `+` ou espaços (ex: `5511999999999`) |
-| `ALLOWED_NUMBERS` | Opcional — número alternativo caso o Evolution API entregue seu número em formato diferente |
-| `ADMIN_SECRET` | Senha para acessar o endpoint `/admin/qrcode` — defina um valor forte em produção |
+| `GEMINI_API_KEY` | Google Gemini API key - get it from [aistudio.google.com](https://aistudio.google.com/app/apikey) |
+| `EVOLUTION_API_KEY` | Key used to protect your Evolution API instance - any value is fine |
+| `EVOLUTION_INSTANCE` | Instance name in Evolution API |
+| `OWNER_PHONE` | Your WhatsApp number with country code and area code, without `+` or spaces (example: `5511999999999`) |
+| `ALLOWED_NUMBERS` | Optional alternate number if Evolution API returns your number in a different format |
+| `ADMIN_SECRET` | Password for the `/admin/qrcode` endpoint - set a strong value in production |
 
-### 3. Suba o projeto
+### 3. Start the project
 
 ```bash
 docker compose up -d --build && docker compose logs -f app
 ```
 
-Na primeira execução, o assistente irá criar a instância no Evolution API automaticamente e exibir um **QR code no terminal**.
+On the first run, the assistant will automatically create the instance in Evolution API and display a **QR code in the terminal**.
 
-Basicamente o QR code vem dos logs do app em Go
+Basically, the QR code comes from the Go app logs.
 
-### 4. Conecte o WhatsApp
+### 4. Connect WhatsApp
 
-Escaneie o QR code exibido no terminal com o seu WhatsApp:
+Scan the QR code shown in the terminal with your WhatsApp app:
 
-> WhatsApp → **Aparelhos conectados** → **Conectar um aparelho** → escaneie o QR code
+> WhatsApp -> **Linked devices** -> **Link a device** -> scan the QR code
 
-Após escanear, o assistente estará pronto para uso.
+After scanning, the assistant will be ready to use.
 
-> Em execuções futuras, se o WhatsApp já estiver conectado, o QR code não será exibido.
+> On future runs, if WhatsApp is already connected, the QR code will not be shown.
 
-## Uso
+## Usage
 
-Com o container rodando e o WhatsApp conectado, envie mensagens para **si mesmo** no WhatsApp.
+With the container running and WhatsApp connected, send messages to **yourself** on WhatsApp.
 
-### Registrar gasto simples
+### Register a simple expense
 ```
-gastei 45 reais no almoço no pix
-```
-
-### Registrar compra parcelada
-```
-comprei um tênis de 300 reais em 3x no cartão
+spent BRL 45 on lunch via PIX
 ```
 
-### Registrar despesa recorrente
+### Register an installment purchase
 ```
-netflix 55 reais todo mês todo dia 15
-```
-
-### Cancelar recorrente
-```
-cancelar netflix
+bought a pair of shoes for BRL 300 in 3 installments by card
 ```
 
-### Registrar entrada (salário, renda)
+### Register a recurring expense
 ```
-recebi 6000 reais de salário
-entrou 500 reais de freela no pix
-```
-
-### Registrar transferência entre contas próprias
-```
-coloquei 2000 reais no cofrinho
-resgatei 500 do CDB
-```
-Transferências não afetam despesas nem entradas — servem apenas para rastrear movimentações entre suas próprias contas.
-
-### Consultar resumo do mês
-```
-quanto gastei esse mês?
-quanto gastei em fevereiro?
+netflix BRL 55 every month on day 15
 ```
 
-O resumo mostra:
-- **Despesas** por categoria
-- **Entradas** totais (se houver)
-- **Resultado** do mês (entradas − despesas)
-- **Investimentos no mês**: quanto foi aplicado, quanto foi resgatado
-- **Em conta**: resultado descontando o líquido que ficou investido
-
-### Importar extrato bancário (PDF)
-
-Envie o PDF do extrato do seu banco diretamente no WhatsApp. O assistente processa todas as transações automaticamente:
-
-- Despesas, entradas e transferências são classificadas pela IA
-- Aplicações no cofrinho e resgates de CDB são detectados como **Transferência** — não inflam as despesas
-- Transações já existentes no banco são sinalizadas para confirmação individual
-- Suporta o formato de extrato do **Itaú** (e outros formatos com datas DD/MM/AAAA ou AAAA-MM-DD)
-
-### Exportar planilha CSV
-
-Peça ao assistente para exportar os gastos de um mês e ele enviará um arquivo `.csv` diretamente no WhatsApp — pronto para abrir no Excel ou Google Sheets:
-
+### Cancel a recurring entry
 ```
-exportar meus gastos de março
-me manda o csv de fevereiro 2024
-quero a planilha de janeiro
-exportar
+cancel netflix
 ```
 
-- Se nenhum mês for especificado, exporta o **mês atual**.
-- Se não houver lançamentos no período, o assistente avisa por texto.
-- O arquivo vem com **BOM UTF-8** para compatibilidade com Excel.
-- Colunas: Data, Descrição, Categoria, Forma de Pagamento, Tipo, Parcela, Valor (R$).
-- Linhas de totais ao final: **TOTAL DESPESAS**, **TOTAL ENTRADAS** (se houver), **SALDO**, **TOTAL APLICADO** / **TOTAL RESGATADO** (se houver transferências).
-- A mensagem que acompanha o arquivo já traz o resumo financeiro: despesas, entradas, resultado, aplicado/resgatado e valor em conta.
-
-> O Gemini interpreta a intenção de exportação, então frases naturais como _"quero ver meus gastos em planilha"_ ou _"gera um csv pra mim"_ também funcionam.
-
-### Relatório mensal automático
-
-No primeiro dia de cada mês, o assistente envia automaticamente a planilha CSV com todos os gastos do mês anterior — sem você precisar pedir.
-
-### Enviar recibo ou nota fiscal
-Tire uma foto ou encaminhe a imagem do recibo diretamente no WhatsApp.
-
-## Segurança e gerenciamento remoto
-
-### Gerar QR Code para conectar o WhatsApp
-
-Abra no navegador substituindo pelo IP da sua VPS ou `localhost` se estiver rodando localmente:
-
+### Register income (salary, freelance)
 ```
-http://<IP-DA-VPS-OU-LOCALHOST>:3000/admin/qrcode?token=sua-senha
+received BRL 6000 as salary
+received BRL 500 from freelance via PIX
 ```
 
-Se o WhatsApp já estiver conectado, exibe uma mensagem de confirmação. Se não, exibe o QR code para escanear — a página atualiza automaticamente a cada 30 segundos.
+### Register a transfer between your own accounts
+```
+put BRL 2000 in the piggy bank
+redeemed 500 from CDB
+```
+Transfers do not affect expenses or income - they are only used to track movements between your own accounts.
 
-**Proteções implementadas:**
-- Requer `ADMIN_SECRET` configurado (retorna `503` se vazio)
-- Rate limit de 10 requisições por minuto por IP
-- `/webhook` aceita conexões apenas do container Evolution API (verificação por IP via DNS interno do Docker)
+### Query the monthly summary
+```
+how much did I spend this month?
+how much did I spend in February?
+```
 
-## Comandos úteis
+The summary shows:
+- **Expenses** by category
+- **Total income** (if any)
+- **Monthly result** (income - expenses)
+- **Investments for the month**: how much was applied and redeemed
+- **In account**: result after subtracting the amount that stayed invested
+
+### Import a bank statement (PDF)
+
+Send your bank statement PDF directly in WhatsApp. The assistant processes all transactions automatically:
+
+- Expenses, income, and transfers are classified by AI
+- Piggy bank deposits and CDB redemptions are detected as **Transfer** - they do not inflate expenses
+- Transactions that already exist in the database are flagged for individual confirmation
+- Supports Itau statement format (and other formats with DD/MM/YYYY or YYYY-MM-DD dates)
+
+### Export a CSV spreadsheet
+
+Ask the assistant to export a month's expenses and it will send a `.csv` file directly in WhatsApp - ready to open in Excel or Google Sheets:
+
+```
+export my March expenses
+send me the CSV for February 2024
+I want the January spreadsheet
+export
+```
+
+- If no month is specified, it exports the **current month**.
+- If there are no entries in the period, the assistant responds with a text message.
+- The file includes **UTF-8 BOM** for Excel compatibility.
+- Columns: Date, Description, Category, Payment Method, Type, Installment, Amount (R$).
+- Total rows at the end: **TOTAL EXPENSES**, **TOTAL INCOME** (if any), **BALANCE**, **TOTAL APPLIED** / **TOTAL REDEEMED** (if transfers exist).
+- The accompanying message already includes the financial summary: expenses, income, result, applied/redeemed, and in-account amount.
+
+> Gemini interprets the export intent, so natural phrases like _"I want to see my expenses in a spreadsheet"_ or _"generate a CSV for me"_ also work.
+
+### Automatic monthly report
+
+On the first day of each month, the assistant automatically sends the CSV spreadsheet with all expenses from the previous month - no request needed.
+
+### Send a receipt or invoice
+Take a photo or forward the receipt image directly in WhatsApp.
+
+## Security and remote management
+
+### Generate a QR code to connect WhatsApp
+
+Open this in your browser, replacing it with your VPS IP or `localhost` if running locally:
 
 ```bash
-# Subir e acompanhar logs da aplicação
+http://<VPS-IP-OR-LOCALHOST>:3000/admin/qrcode?token=your-password
+```
+
+If WhatsApp is already connected, it shows a confirmation message. Otherwise, it shows the QR code to scan - the page refreshes automatically every 30 seconds.
+
+**Implemented protections:**
+- Requires `ADMIN_SECRET` to be configured (returns `503` if empty)
+- Rate limit of 10 requests per minute per IP
+- `/webhook` only accepts connections from the Evolution API container (IP verification via Docker internal DNS)
+
+## Useful commands
+
+```bash
+# Start and follow application logs
 docker compose up -d --build && docker compose logs -f app
 
-# Ver logs em tempo real
+# View logs in real time
 docker compose logs -f app
 
-# Parar os containers
+# Stop the containers
 docker compose down
 
-# Parar e apagar todos os dados (banco, volumes)
+# Stop and delete all data (database, volumes)
 docker compose down -v
 
-# Acessar o banco de dados
+# Access the database
 docker compose exec postgres psql -U finassist -d finassist
 ```
 
-## Estrutura do projeto
+## Project structure
 
 ```
-cmd/                                        entrypoint da aplicação
+cmd/                                        application entrypoint
 internal/
-    config/                               carregamento de variáveis de ambiente
-    domain/                               entidades e regras de negócio
-    usecase/                              casos de uso (análise, recorrentes, consulta, exportação)
+    config/                               environment variable loading
+    domain/                               business entities and rules
+    usecase/                              use cases (analysis, recurring, queries, export)
     infra/
-        db/                               repositório PostgreSQL
-        evolution/                        cliente da Evolution API (WhatsApp)
-        gemini/                           cliente do Google Gemini
-        http/                             servidor HTTP e webhook handler
-migrations/                               scripts SQL de criação do banco
+        db/                               PostgreSQL repository
+        evolution/                        Evolution API (WhatsApp) client
+        gemini/                           Google Gemini client
+        http/                             HTTP server and webhook handler
+migrations/                               database creation SQL scripts
 ```
 
-## Licença
+## License
 
 MIT

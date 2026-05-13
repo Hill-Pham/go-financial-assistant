@@ -75,13 +75,13 @@ const qrcodeHTML = `<!DOCTYPE html>
 </head>
 <body>
   <div class="card">
-    <h2>Conectar WhatsApp</h2>
-    <p>Escaneie o QR code abaixo com o seu WhatsApp</p>
+	<h2>Connect WhatsApp</h2>
+	<p>Scan the QR code below with your WhatsApp</p>
     <img src="%s" width="280" height="280" alt="QR Code WhatsApp">
     <div class="hint">
-      WhatsApp &rarr; <strong>Aparelhos conectados</strong> &rarr; <strong>Conectar um aparelho</strong>
+	WhatsApp &rarr; <strong>Linked devices</strong> &rarr; <strong>Link a device</strong>
     </div>
-    <p style="margin-top:16px">Esta página atualiza automaticamente a cada 30 segundos.</p>
+	<p style="margin-top:16px">This page refreshes automatically every 30 seconds.</p>
   </div>
 </body>
 </html>`

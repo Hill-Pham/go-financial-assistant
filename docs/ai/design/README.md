@@ -226,7 +226,7 @@ flowchart TD
     A -- Yes --> DOC{Document\nmessage?}
     DOC -- Yes --> IMPORT[Statement import flow]
     DOC -- No --> PEND{Pending import\nsession?}
-    PEND -- Yes --> CONFIRM[Process sim/não confirmation]
+    PEND -- Yes --> CONFIRM[Process yes/no confirmation]
     PEND -- No --> ROUTE[route: text/image]
     ROUTE --> AI[Gemini classify]
     AI --> TYPE{ExpenseType}
